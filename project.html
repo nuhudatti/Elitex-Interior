@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELITEX SHOWCASE | Beyond Interior Design | Global Masterpieces</title>
+    <meta name="description" content="Experience ELITEX INTERIOR's revolutionary design showcase - a digital gallery that transcends space and time. Witness interior design redefined for eternity.">
+    
+    <!-- Global Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nuhudatti.github.io/Elitex-Interior/showcase">
+    <meta property="og:title" content="ELITEX SHOWCASE | Beyond Interior Design">
+    <meta property="og:description" content="Where Design Transcends Reality - A Global Digital Masterpiece">
+    <meta property="og:image" content="meta-showcase.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="ELITEX SHOWCASE | Beyond Interior Design">
+    <meta property="twitter:description" content="Witness interior design redefined for eternity">
+    <meta property="twitter:image" content="meta-showcase.png">
+    
+    <!-- Advanced Resources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0A0F1A;
+            --secondary: #C9A96E;
+            --accent: #2A2D3A;
+            --light: #F5F3F0;
+            --text: #1A1A1A;
+            --eternal-gold: linear-gradient(135deg, #C9A96E 0%, #E8D9B5 50%, #D4AF37 100%);
+            --space-purple: linear-gradient(135deg, #0A0F1A 0%, #1A1F2A 50%, #2A2F3A 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--primary);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            background: var(--eternal-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Cosmic Cursor */
+        .cosmic-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor-follower {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--secondary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.3s ease-out;
+            mix-blend-mode: difference;
+        }
+
+        /* Quantum Preloader */
+        #quantum-preloader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--primary);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .quantum-loader {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+        
+        .quantum-orbit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            animation: quantum-spin 2s linear infinite;
+        }
+        
+        .quantum-orbit:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-top-color: #E8D9B5;
+            animation-duration: 1.5s;
+            animation-direction: reverse;
+        }
+        
+        .quantum-orbit:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+            border-top-color: #D4AF37;
+            animation-duration: 1s;
+        }
+        
+        @keyframes quantum-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Revolutionary 4D Grid */
+        .eternal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-auto-rows: minmax(400px, auto);
+            gap: 20px;
+            width: 100%;
+            perspective: 2000px;
+            padding: 0 20px;
+        }
+        
+        .eternal-item {
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            transform-style: preserve-3d;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateZ(0);
+        }
+        
+        .eternal-item:hover {
+            transform: translateZ(50px) rotateX(5deg) rotateY(5deg) scale(1.05);
+            z-index: 100;
+            border-color: var(--secondary);
+            box-shadow: 0 25px 50px rgba(201, 169, 110, 0.2), 0 0 100px rgba(201, 169, 110, 0.1);
+        }
+        
+        .eternal-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(201, 169, 110, 0.1) 50%, transparent 70%);
+            background-size: 200% 200%;
+            opacity: 0;
+            transition: opacity 0.6s;
+            z-index: 2;
+        }
+        
+        .eternal-item:hover::before {
+            opacity: 1;
+            animation: eternal-shimmer 2s infinite;
+        }
+        
+        @keyframes eternal-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .eternal-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            transform: translateZ(30px);
+        }
+        
+        .eternal-item:hover .eternal-media {
+            transform: translateZ(60px) scale(1.1);
+        }
+        
+        .eternal-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(10, 15, 26, 0.95), transparent);
+            color: white;
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(201, 169, 110, 0.2);
+        }
+        
+        .eternal-item:hover .eternal-overlay {
+            transform: translateY(0);
+        }
+        
+        .eternal-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 80px;
+            height: 80px;
+            background: rgba(201, 169, 110, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 2rem;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .eternal-item:hover .eternal-play {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1) translateZ(80px);
+        }
+
+        /* Cosmic Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(201, 169, 110, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
+            animation: cosmic-drift 20s ease-in-out infinite;
+        }
+        
+        @keyframes cosmic-drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-10px, -10px) scale(1.02); }
+        }
+
+        /* Quantum Navigation */
+        .quantum-nav {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .quantum-btn {
+            padding: 1rem 2rem;
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            color: var(--light);
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .quantum-btn:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 169, 110, 0.3);
+        }
+
+        /* Eternal Modal with Scrollable Content */
+        .eternal-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 26, 0.98);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+        }
+        
+        .eternal-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            width: 90%;
+            max-width: 1400px;
+            max-height: 90vh;
+            background: rgba(10, 15, 26, 0.9);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            transform: scale(0.8) rotateX(10deg);
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            backdrop-filter: blur(30px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .eternal-modal.active .modal-content {
+            transform: scale(1) rotateX(0);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(201, 169, 110, 0.9);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 10001;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        @media (min-width: 1024px) {
+            .modal-body {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .modal-media {
+            position: relative;
+            height: 100%;
+            min-height: 400px;
+        }
+        
+        .modal-media img,
+        .modal-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-info {
+            padding: 3rem;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+        
+        .modal-info::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-info::-webkit-scrollbar-track {
+            background: rgba(201, 169, 110, 0.1);
+            border-radius: 10px;
+        }
+        
+        .modal-info::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        /* Infinite Scroll Effect */
+        .infinite-scroll {
+            position: relative;
+            min-height: 100vh;
+            padding: 8rem 2rem;
+        }
+        
+        .cosmic-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Quantum Typography */
+        .quantum-title {
+            font-size: clamp(3rem, 8vw, 8rem);
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        .quantum-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--eternal-gold);
+        }
+        
+        /* 4D Floating Elements */
+        .floating-element {
+            transform-style: preserve-3d;
+            animation: float3d 8s ease-in-out infinite;
+        }
+        
+        @keyframes float3d {
+            0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+            25% { transform: translateY(-20px) rotateX(5deg) rotateY(5deg); }
+            50% { transform: translateY(-10px) rotateX(0) rotateY(10deg); }
+            75% { transform: translateY(-20px) rotateX(-5deg) rotateY(5deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .eternal-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: minmax(300px, auto);
+                gap: 15px;
+                padding: 0 15px;
+            }
+            
+            .quantum-nav {
+                top: 1rem;
+                right: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .quantum-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .cosmic-cursor, .cursor-follower {
+                display: none;
+            }
+            
+            body {
+                cursor: default;
+            }
+            
+            .modal-info {
+                padding: 2rem;
+            }
+            
+            .infinite-scroll {
+                padding: 6rem 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .eternal-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: minmax(250px, auto);
+            }
+            
+            .eternal-overlay {
+                padding: 1.5rem;
+            }
+            
+            .quantum-title {
+                font-size: clamp(2rem, 10vw, 4rem);
+            }
+        }
+
+        /* Enhanced Mobile Grid */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .eternal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Special Grid for Very Large Screens */
+        @media (min-width: 1600px) {
+            .eternal-grid {
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Cosmic Cursor System -->
+    <div class="cosmic-cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- Quantum Preloader -->
+    <div id="quantum-preloader">
+        <div class="quantum-loader">
+            <div class="quantum-orbit"></div>
+            <div class="quantum-orbit"></div>
+            <div class="quantum-orbit"></div>
+        </div>
+        <p class="mt-8 text-lg text-gray-400">INITIALIZING ETERNAL SHOWCASE</p>
+    </div>
+
+    <!-- Cosmic Background -->
+    <div class="cosmic-bg"></div>
+
+    <!-- Quantum Navigation -->
+    <nav class="quantum-nav">
+        <a href="index.html" class="quantum-btn">
+            <i class="fas fa-home mr-2"></i>Home
+        </a>
+        <!-- <button class="quantum-btn" id="filterAll">
+            <i class="fas fa-globe mr-2"></i>All Projects
+        </button> -->
+        <button class="quantum-btn" id="toggleMusic">
+            <i class="fas fa-music mr-2"></i>Cosmic Sound
+        </button>
+    </nav>
+
+    <!-- Eternal Showcase -->
+    <main class="infinite-scroll">
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center px-4">
+            <div class="text-center max-w-6xl mx-auto">
+                <h1 class="quantum-title floating-element">
+                    BEYOND<br>DESIGN
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+                    Where spaces transcend reality and design becomes eternal. Welcome to the future of interior architecture.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-6">
+                    <button class="quantum-btn text-lg py-4 px-8" onclick="scrollToProjects()">
+                        EXPLORE MASTERPIECES
+                    </button>
+                    <button class="quantum-btn text-lg py-4 px-8" onclick="startImmersion()">
+                        BEGIN IMMERSION
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Grid -->
+        <section id="projects" class="py-20 px-4">
+            <h2 class="quantum-title mb-16">ETERNAL CREATIONS</h2>
+            <div class="eternal-grid" id="showcaseGrid">
+
+                <!-- Project 0 -->
+                 <!-- Project 1 -->
+                <div class="eternal-item" data-category="luxury" data-project="new2">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="./vid/new1.mov" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">PROJECT VOUGUE</h3>
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+                <!-- Project 1 -->
+                <div class="eternal-item" data-category="luxury" data-project="ruwaidis">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">RUWAYDIS VEils</h3>
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="eternal-item" data-category="commercial" data-project="luxe-hangers">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img1_meydv5.jpg" alt="Luxe Hangers" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Luxe Hangers</h3>
+                        <p class="text-gray-300">Redefining retail luxury spaces</p>
+                    </div>
+                </div>
+
+                 <!-- Project new -->
+                <div class="eternal-item" data-category="luxury" data-project="new">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762515200/new2_zpesho.mov" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <!-- <h3 class="text-2xl font-bold mb-2">RUWAYDIS VEils</h3> -->
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+
+                
+
+                <div class="eternal-item" data-category="luxury" data-project="sd2">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372087/sg4_lb3qcc.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <!-- <h3 class="text-2xl font-bold mb-2">RUWAYDIS VEils</h3> -->
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                
+
+                <!-- Project 4 -->
+                <div class="eternal-item" data-category="commercial" data-project="executive-office">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img2_jrpwdr.jpg" alt="Executive Office" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Executive Office</h3>
+                        <p class="text-gray-300">Where productivity meets prestige</p>
+                    </div>
+                </div>
+
+                
+
+                
+                <!-- Project 5 -->
+                <div class="eternal-item" data-category="commercial" data-project="contemporary-office">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198497/vid6_zrjttz.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198497/vid6_zrjttz.mp4" type="video/mp4">
+                    </video> -->
+                    
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Contemporary Office</h3>
+                        <p class="text-gray-300">Modern workspace revolution</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="eternal-item" data-category="residential" data-project="neeshad">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="luxury" data-project="sd3">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372098/sg2_nqvqhv.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <!-- <h3 class="text-2xl font-bold mb-2">RUWAYDIS VEils</h3> -->
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+
+                <div class="eternal-item" data-category="luxury" data-project="sd">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372109/sg_gbxwtq.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4" type="video/mp4">
+                    </video> -->
+
+                    <div class="eternal-overlay">
+                        <!-- <h3 class="text-2xl font-bold mb-2">RUWAYDIS VEils</h3> -->
+                        <p class="text-gray-300">Where fashion meets architecture in perfect harmony</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                
+
+                <!-- Project 6 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198496/vid4_le6khu.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198496/vid4_le6khu.mp4" type="video/mp4">
+                    </video> -->
+
+                    
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 7 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198373/D4074167-9C58-4125-8B5F-224D919100E2_e7i96o.mp4" type="video/mp4">
+                    </video>
+
+                     <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198373/D4074167-9C58-4125-8B5F-224D919100E2_e7i96o.mp4" type="video/mp4">
+                    </video> -->
+                    <!-- <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div> -->
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 8 -->
+                    <!-- <div class="eternal-item" data-category="residential" data-project="neeshad">
+                        <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg" alt="Neeshad Collection" class="eternal-media">
+                        <div class="eternal-overlay">
+                            <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                            <p class="text-gray-300">Timeless residential elegance</p>
+                        </div>
+                    </div> -->
+
+
+                <!-- Project 9 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated2">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198377/895474A2-1ECC-441D-8187-7F6B0303686C_y2dev4.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198377/895474A2-1ECC-441D-8187-7F6B0303686C_y2dev4.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 10 -->
+                <!-- <div class="eternal-item" data-category="residential" data-project="neeshad">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div> -->
+
+                <!-- Project 11 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated3">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198371/2F5BDB83-2D39-4E37-98F0-D9FB85A43921_ifemdl.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198371/2F5BDB83-2D39-4E37-98F0-D9FB85A43921_ifemdl.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 12 -->
+                <!-- <div class="eternal-item" data-category="residential" data-project="neeshad">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div> -->
+
+                <!-- Project 13 -->
+                <!-- <div class="eternal-item" data-category="residential" data-project="neeshad">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div> -->
+
+                <!-- Project 14 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated4">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198369/91245C85-D087-4F8B-AFDB-E3C3B90EE65A_xzbej4.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198369/91245C85-D087-4F8B-AFDB-E3C3B90EE65A_xzbej4.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+
+                <!-- Project 15 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated5">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198365/E4B6D9ED-8513-4C6C-814A-BBBD0D0AE8BC_eu2hn0.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198365/E4B6D9ED-8513-4C6C-814A-BBBD0D0AE8BC_eu2hn0.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <!-- Project 14 -->
+                <div class="eternal-item" data-category="residential" data-project="neeshad2">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198364/183371FD-173C-406B-8BA1-990BBCBB52B5_bsa3oc.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div>
+                 <!-- Project 15 -->
+                <!-- <div class="eternal-item" data-category="residential" data-project="neeshad2">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198361/4BE1A9B9-EF9C-4C9A-BBC8-FD69D276656F_yznwnk.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div>
+                </div> -->
+                 <!-- Project 16 -->
+                <div class="eternal-item" data-category="residential" data-project="neeshad3">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198360/4BE1A9B9-EF9C-4C9A-BBC8-FD69D276656F_g3wrrx.jpg" alt="Neeshad Collection" class="eternal-media">
+                    <!-- <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Neeshad Collection</h3>
+                        <p class="text-gray-300">Timeless residential elegance</p>
+                    </div> -->
+                </div>
+
+                
+
+
+                <!-- Additional projects to showcase the grid -->
+                <!-- <div class="eternal-item" data-category="luxury" data-project="royal-suite">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198364/4695C262-675A-4B5A-AA63-D7EDA0256002_vd2u3a.jpg" alt="Royal Suite" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Royal Suite</h3>
+                        <p class="text-gray-300">Luxury redefined in every detail</p>
+                    </div>
+                </div> -->
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198363/4695C262-675A-4B5A-AA63-D7EDA0256002_uhhekz.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                 <!-- Project 15 -->
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated0">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198361/8DED3065-54A6-41A2-AA40-932778D56463_sdse7e.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198361/8DED3065-54A6-41A2-AA40-932778D56463_sdse7e.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated00">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198344/1C34D17E-0F84-4FE4-BA67-DB751CDAF3BC_vnol0i.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198344/1C34D17E-0F84-4FE4-BA67-DB751CDAF3BC_vnol0i.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis1">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198359/0EE99DA8-BA57-41F1-96AD-D55A29247071_fqgus1.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis2">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198357/7D75011B-25CC-414A-A25F-6090844DC215_v53gqa.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis3">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198356/3153E686-4A3B-4017-99E4-D389A12C8F17_f9dolg.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis4">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198355/2B57A296-7ABD-4743-A495-659EA6135DA4_xhycxu.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis5">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198353/D9065CCE-EA35-4228-BF97-98A0DB897CFD_m332jp.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis7">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198351/9FFCA5BE-E1EE-4039-9F18-6AA14F17707A_dxkwdu.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated10">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198347/14DB7D54-4A3A-489D-BB70-E19630E74A54_drbxyd.mp4" type="video/mp4">
+                    </video>
+
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198347/14DB7D54-4A3A-489D-BB70-E19630E74A54_drbxyd.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+                 <div class="eternal-item" data-category="luxury" data-project="sophisticated11">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198336/3F4FE72B-F8AA-4E7E-BF2B-93D67FB32DBC_uxm87t.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198336/3F4FE72B-F8AA-4E7E-BF2B-93D67FB32DBC_uxm87t.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+                
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis10">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198342/50B7EFA6-AC54-44B6-9534-548A9FD0E227_orkocq.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis11">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198342/DB97B453-F6EB-4EBD-91C1-8420607BB799_e3eqmo.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis12">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198338/36E0C37D-03D6-4136-876A-B30181550F78_qe98tg.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis13">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198337/3561E770-46D1-4A3B-B7F4-6B7972BF3008_lsyo8p.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis14">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198336/F9A09C52-6BBB-4503-9A96-8023AF61DAC1_gcrsa4.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated12">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198335/30BDE079-D8C8-4920-A6F7-F6C545B4E714_j9xtsj.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198335/30BDE079-D8C8-4920-A6F7-F6C545B4E714_j9xtsj.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated13">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198306/5D927F8D-26F2-4841-A216-58339CEACCFC_no5euh.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198306/5D927F8D-26F2-4841-A216-58339CEACCFC_no5euh.mp4" type="video/mp4">
+                    </video> -->
+
+                    
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+
+                
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis15">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/84F2AB49-5A8A-4E94-97A6-8904E10C1562_klgldw.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis16">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/903EE27C-E94E-447B-8096-FD3B45AFF9BB_kfklvg.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis17">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/3C63116D-410C-4F2C-9D33-817DA2F5ECE8_fp06yg.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis18">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/84F2AB49-5A8A-4E94-97A6-8904E10C1562_klgldw.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+
+                <!-- <div class="eternal-item" data-category="residential" data-project="urban-oasis">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/3C63116D-410C-4F2C-9D33-817DA2F5ECE8_fp06yg.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div> -->
+                
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis19">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198298/C3BA8C2A-FCA4-4AA3-A24A-D3FAAB41FBFD_nnalyl.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis20">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198298/331F0E99-B53C-41A1-A643-F76D21EC5D7D_cjhcyw.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis21">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198292/F5891D68-31A9-470D-88C1-314326FD6699_jxhn95.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis22">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198287/5BA2352D-1DE8-492F-9BAF-0F920C50254D_fao36c.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis23">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198286/02896EB7-6364-456C-94CC-93C62C1F34C8_sfojaj.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+
+                <!-- <div class="eternal-item" data-category="residential" data-project="urban-oasis">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198286/02896EB7-6364-456C-94CC-93C62C1F34C8_sfojaj.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div> -->
+
+                <div class="eternal-item" data-category="residential" data-project="urban-oasis24">
+                    <img src="https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198284/A4F242F8-13F6-4B21-9DB3-AF89642EE5D8_htlakw.jpg" alt="Urban Oasis" class="eternal-media">
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Urban Oasis</h3>
+                        <p class="text-gray-300">Serenity in the heart of the city</p>
+                    </div>
+                </div>
+                
+                <div class="eternal-item" data-category="luxury" data-project="sophisticated16">
+                    <video class="eternal-media" autoplay loop muted playsinline>
+                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198292/917ECE9F-D14B-488C-98D7-5DEB463AAF0A_rzs5vb.mp4" type="video/mp4">
+                    </video>
+
+                    <!-- <video class="eternal-media" muted playsinline loop>
+                       <source data-src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198292/917ECE9F-D14B-488C-98D7-5DEB463AAF0A_rzs5vb.mp4" type="video/mp4">
+                    </video> -->
+                    <div class="eternal-overlay">
+                        <h3 class="text-2xl font-bold mb-2">Sophisticated Spaces</h3>
+                        <p class="text-gray-300">Where gatherings become experiences</p>
+                    </div>
+                    <div class="eternal-play">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Philosophy Section -->
+        <section class="py-32 px-4 text-center">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="quantum-title mb-12">BEYOND DESIGN, BEYOND TIME</h2>
+                <p class="text-xl text-gray-300 leading-relaxed mb-8">
+                    We don't just create spaces. We craft environments that transcend the ordinary, 
+                    where every corner tells a story and every detail echoes through eternity.
+                </p>
+                <p class="text-lg text-gray-400">
+                    This is not interior design. This is the art of space, reimagined for generations to come.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Eternal Modal -->
+    <div class="eternal-modal" id="projectModal">
+        <div class="modal-close" id="modalClose">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-media">
+                    <video id="modalVideo" class="w-full h-full" controls>
+                        Your browser does not support the video tag.
+                    </video>
+                    <img id="modalImage" class="w-full h-full hidden" alt="Project Image">
+                </div>
+                <div class="modal-info">
+                    <h3 id="modalTitle" class="text-4xl font-bold mb-6"></h3>
+                    <p id="modalDescription" class="text-gray-300 text-lg leading-relaxed mb-8"></p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[var(--secondary)]/20 flex items-center justify-center">
+                                <i class="fas fa-ruler-combined text-[var(--secondary)]"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Project Scale</p>
+                                <p class="text-gray-400" id="modalScale"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[var(--secondary)]/20 flex items-center justify-center">
+                                <i class="fas fa-calendar text-[var(--secondary)]"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Completion</p>
+                                <p class="text-gray-400" id="modalDate"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[var(--secondary)]/20 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-[var(--secondary)]"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Location</p>
+                                <p class="text-gray-400" id="modalLocation"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-gray-700">
+                        <h4 class="text-xl font-bold mb-4">Design Philosophy</h4>
+                        <p id="modalPhilosophy" class="text-gray-300 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cosmic Audio -->
+    <audio id="cosmicAudio" loop>
+        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1761317720/elitexinterior_d2kpx9.mp3" type="audio/mpeg">
+    </audio>
+
+
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", () => {
+  const items = document.querySelectorAll('.eternal-item');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const video = entry.target.querySelector('video');
+      const source = video.querySelector('source');
+
+      if (entry.isIntersecting) {
+        if (!source.src) {
+          source.src = source.dataset.src;
+          video.load();
+        }
+        video.play();
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  items.forEach(item => observer.observe(item));
+});
+
+    </script> -->
+
+    <script>
+        // // Quantum Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('quantum-preloader');
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            }, 2000);
+        });
+
+        // Cosmic Cursor
+        const cursor = document.getElementById('cursor');
+        const cursorFollower = document.getElementById('cursorFollower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        // Project Modal
+        const modal = document.getElementById('projectModal');
+        const modalClose = document.getElementById('modalClose');
+        const eternalItems = document.querySelectorAll('.eternal-item');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalImage = document.getElementById('modalImage');
+
+        eternalItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const project = item.getAttribute('data-project');
+                openProjectModal(project);
+            });
+        });
+
+        modalClose.addEventListener('click', () => {
+            modal.classList.remove('active');
+            modalVideo.pause();
+        });
+
+        // Close modal when clicking outside content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                modalVideo.pause();
+            }
+        });
+
+        function openProjectModal(project) {
+            // Project data - in real implementation, this would come from a database
+            const projects = {
+                'ruwaidis': {
+                    title: 'RUWAYDIS VEils',
+                    description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    scale: 'Luxury Boutique - 450 sqm',
+                    date: 'Completed 2025',
+                    location: 'Abuja, Nigeria',
+                    philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198511/vid2_v25hnr.mp4'
+                },
+                'new': {
+                    title: 'PROJECT TENTOES',
+                    description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    philosophy: "From the exclusive lace section to the men's fabric area, we poured our hearts into every corner of this 5-bedroom duplex, planing, styling and paying attention to the tiniest detials",
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762515200/new2_zpesho.mov'
+                },
+                'new2': {
+                    title: 'PROJECT VOUGUE',
+                    // description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    // philosophy: "From the exclusive lace section to the men's fabric area, we poured our hearts into every corner of this 5-bedroom duplex, planing, styling and paying attention to the tiniest detials",
+                    philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: './vid/new1.mov'
+                },
+                
+                'luxe-hangers': {
+                    title: 'Luxe Hangers',
+                    description: 'Transforming retail into an immersive luxury experience. Where every hanger holds a story of sophistication. The Luxe Hangers concept store creates an environment where products become art and shopping becomes an experience.',
+                    scale: 'Retail Space - 280 sqm',
+                    date: 'Completed 2023',
+                    location: 'Abuja, Nigeria',
+                    philosophy: 'We challenged the conventional retail experience by creating a space that feels more like a gallery than a store. The design encourages exploration and discovery, turning each visit into a memorable journey.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img1_meydv5.jpg'
+                },
+                'sd': {
+                    // title: 'sp',
+                    // description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    // philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372109/sg_gbxwtq.mp4'
+                },
+                'sd2': {
+                    // title: 'RUWAYDIS VEils',
+                    // description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    // philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372062/sg3_n8igja.mp4'
+                },
+                'sd3': {
+                    // title: 'RUWAYDIS VEils',
+                    // description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    // philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372098/sg2_nqvqhv.mp4'
+                },
+                'sd4': {
+                    // title: 'RUWAYDIS VEils',
+                    // description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
+                    // scale: 'Luxury Boutique - 450 sqm',
+                    // date: 'Completed 2025',
+                    // location: 'Abuja, Nigeria',
+                    // philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1762372098/sg2_nqvqhv.mp4'
+                },
+                'neeshad': {
+                    title: 'Neeshad Collection',
+                    description: 'Timeless residential elegance meets modern functionality in this exquisite private residence. The Neeshad Collection represents our commitment to creating homes that are both beautiful and livable.',
+                    scale: 'Private Residence - 650 sqm',
+                    date: 'Completed 2022',
+                    location: 'Abuja, Nigeira',
+                    philosophy: 'We believe a home should reflect the personality of its inhabitants while providing a sanctuary from the outside world. This project balances bold design statements with comforting, intimate spaces.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198482/img4_htliq6.jpg'
+                },
+                'executive-office': {
+                    title: 'Executive Office',
+                    description: 'Where productivity meets prestige in a workspace designed for innovation and collaboration. The Executive Office reimagines corporate environments as inspiring spaces that fuel creativity.',
+                    scale: 'Corporate Office - 800 sqm',
+                    date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to break down hierarchical barriers while maintaining an atmosphere of professionalism. Open collaborative areas flow seamlessly into private thinking spaces, supporting both teamwork and focused work.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img2_jrpwdr.jpg'
+                },
+                'contemporary-office': {
+                    title: 'Contemporary Office',
+                    description: 'Modern workspace revolution that blends technology, sustainability, and human-centered design. This project represents the future of work environments.',
+                    scale: 'Tech Hub - 1200 sqm',
+                    date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We believe the workspace of the future must be adaptable, sustainable, and inspiring. This design incorporates biophilic elements, flexible layouts, and cutting-edge technology to create an environment that supports both productivity and wellbeing.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198497/vid6_zrjttz.mp4'
+                },
+                'sophisticated0': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198361/8DED3065-54A6-41A2-AA40-932778D56463_sdse7e.mp4'
+                },
+                'sophisticated00': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198344/1C34D17E-0F84-4FE4-BA67-DB751CDAF3BC_vnol0i.mp4'
+                },
+                               'sophisticated': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198373/D4074167-9C58-4125-8B5F-224D919100E2_e7i96o.mp4'
+                },
+                'sophisticated2': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198377/895474A2-1ECC-441D-8187-7F6B0303686C_y2dev4.mp4'
+                },
+                'sophisticated3': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198371/2F5BDB83-2D39-4E37-98F0-D9FB85A43921_ifemdl.mp4'
+                },
+                'sophisticated4': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198369/91245C85-D087-4F8B-AFDB-E3C3B90EE65A_xzbej4.mp4'
+                },
+                'sophisticated5': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    location: 'Nigeira',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198365/E4B6D9ED-8513-4C6C-814A-BBBD0D0AE8BC_eu2hn0.mp4'
+                },
+
+                'sophisticated6': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198361/8DED3065-54A6-41A2-AA40-932778D56463_sdse7e.mp4'
+                },
+
+                'sophisticated7': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198344/1C34D17E-0F84-4FE4-BA67-DB751CDAF3BC_vnol0i.mp4'
+                },
+                  
+              'sophisticated10': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: ' https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198347/14DB7D54-4A3A-489D-BB70-E19630E74A54_drbxyd.mp4'
+                },
+                'sophisticated11': {
+                    title: 'Sophisticated Spaces',
+                    description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198336/3F4FE72B-F8AA-4E7E-BF2B-93D67FB32DBC_uxm87t.mp4'
+                },
+                
+                'neeshad3': {
+                    // title: 'Neeshad Collection',
+                    // description: 'Timeless residential elegance meets modern functionality in this exquisite private residence. The Neeshad Collection represents our commitment to creating homes that are both beautiful and livable.',
+                    // scale: 'Private Residence - 650 sqm',
+                    // date: 'Completed 2022',
+                    // location: 'New York, USA',
+                    // philosophy: 'We believe a home should reflect the personality of its inhabitants while providing a sanctuary from the outside world. This project balances bold design statements with comforting, intimate spaces.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198361/4BE1A9B9-EF9C-4C9A-BBC8-FD69D276656F_yznwnk.jpg'
+                },
+                'neeshad2': {
+                    // title: 'Neeshad Collection',
+                    // description: 'Timeless residential elegance meets modern functionality in this exquisite private residence. The Neeshad Collection represents our commitment to creating homes that are both beautiful and livable.',
+                    // scale: 'Private Residence - 650 sqm',
+                    // date: 'Completed 2022',
+                    // location: 'New York, USA',
+                    // philosophy: 'We believe a home should reflect the personality of its inhabitants while providing a sanctuary from the outside world. This project balances bold design statements with comforting, intimate spaces.',
+                    image: ' https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198364/183371FD-173C-406B-8BA1-990BBCBB52B5_bsa3oc.jpg'
+                },
+                'royal-suite': {
+                    // title: 'Royal Suite',
+                    // description: 'Luxury redefined in every detail of this exclusive hotel suite. The Royal Suite offers an unparalleled experience of comfort and elegance.',
+                    // scale: 'Hotel Suite - 180 sqm',
+                    // date: 'Completed 2022',
+                    // location: 'Dubai, UAE',
+                    // philosophy: 'Our approach to hospitality design focuses on creating moments of delight and surprise. The Royal Suite offers a journey through carefully curated spaces that each tell a different part of the luxury story.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img3_w6cdnv.jpg'
+                },
+                'urban-oasis': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198363/4695C262-675A-4B5A-AA63-D7EDA0256002_uhhekz.jpg'
+                },
+                'urban-oasis1': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198359/0EE99DA8-BA57-41F1-96AD-D55A29247071_fqgus1.jpg'
+                },
+                'urban-oasis2': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198357/7D75011B-25CC-414A-A25F-6090844DC215_v53gqa.jpg'
+                },
+                'urban-oasis3': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198356/3153E686-4A3B-4017-99E4-D389A12C8F17_f9dolg.jpg'
+                },
+                'urban-oasis4': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198355/2B57A296-7ABD-4743-A495-659EA6135DA4_xhycxu.jpg'
+                },
+                'urban-oasis5': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198353/D9065CCE-EA35-4228-BF97-98A0DB897CFD_m332jp.jpg'
+                },
+                'urban-oasis6': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198356/3153E686-4A3B-4017-99E4-D389A12C8F17_f9dolg.jpg'
+                },
+                'urban-oasis7': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198351/9FFCA5BE-E1EE-4039-9F18-6AA14F17707A_dxkwdu.jpg'
+                },
+                'urban-oasis10': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198342/50B7EFA6-AC54-44B6-9534-548A9FD0E227_orkocq.jpg'
+                },
+                'urban-oasis11': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198342/DB97B453-F6EB-4EBD-91C1-8420607BB799_e3eqmo.jpg'
+                },
+                'urban-oasis12': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198338/36E0C37D-03D6-4136-876A-B30181550F78_qe98tg.jpg'
+                },
+                'urban-oasis13': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198337/3561E770-46D1-4A3B-B7F4-6B7972BF3008_lsyo8p.jpg'
+                },
+                'urban-oasis14': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198337/3561E770-46D1-4A3B-B7F4-6B7972BF3008_lsyo8p.jpg'
+                },
+                'sophisticated12': {
+                    // title: 'Sophisticated Spaces',
+                    // description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    // philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198335/30BDE079-D8C8-4920-A6F7-F6C545B4E714_j9xtsj.mp4'
+                },
+                'sophisticated13': {
+                    // title: 'Sophisticated Spaces',
+                    // description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    // philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198306/5D927F8D-26F2-4841-A216-58339CEACCFC_no5euh.mp4'
+                },
+                'sophisticated14': {
+                    // title: 'Sophisticated Spaces',
+                    // description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    // philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198335/30BDE079-D8C8-4920-A6F7-F6C545B4E714_j9xtsj.mp4'
+                },
+                'sophisticated15': {
+                    // title: 'Sophisticated Spaces',
+                    // description: 'Where gatherings become experiences in this multi-functional entertainment space. Sophisticated Spaces transforms social interactions into memorable events through thoughtful design.',
+                    // scale: 'Entertainment Venue - 550 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Paris, France',
+                    // philosophy: 'We designed this space to facilitate connection while maintaining an atmosphere of exclusivity and sophistication. Every element, from lighting to acoustics, was carefully considered to enhance social experiences.',
+                    video: 'https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198306/5D927F8D-26F2-4841-A216-58339CEACCFC_no5euh.mp4'
+                },
+                'urban-oasis16': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/903EE27C-E94E-447B-8096-FD3B45AFF9BB_kfklvg.jpg'
+                },
+                'urban-oasis17': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/3C63116D-410C-4F2C-9D33-817DA2F5ECE8_fp06yg.jpg'
+                },
+                'urban-oasis18': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198302/84F2AB49-5A8A-4E94-97A6-8904E10C1562_klgldw.jpg'
+                },
+                'urban-oasis19': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198298/C3BA8C2A-FCA4-4AA3-A24A-D3FAAB41FBFD_nnalyl.jpg'
+                },
+                'urban-oasis20': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198298/331F0E99-B53C-41A1-A643-F76D21EC5D7D_cjhcyw.jpg'
+                },
+                'urban-oasis21': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198292/F5891D68-31A9-470D-88C1-314326FD6699_jxhn95.jpg'
+                },
+                'urban-oasis22': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198287/5BA2352D-1DE8-492F-9BAF-0F920C50254D_fao36c.jpg'
+                },
+                'urban-oasis23': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198287/5BA2352D-1DE8-492F-9BAF-0F920C50254D_fao36c.jpg'
+                },
+                'urban-oasis24': {
+                    // title: 'Urban Oasis',
+                    // description: 'Serenity in the heart of the city - a residential project that brings nature into urban living. Urban Oasis creates a peaceful retreat from the bustling city outside.',
+                    // scale: 'Apartment Complex - 950 sqm',
+                    // date: 'Completed 2023',
+                    // location: 'Tokyo, Japan',
+                    // philosophy: 'We believe that even in dense urban environments, residents should have access to peaceful, natural spaces. This project integrates green elements throughout, creating a seamless connection between indoor and outdoor living.',
+                    image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198286/02896EB7-6364-456C-94CC-93C62C1F34C8_sfojaj.jpg'
+                }
+                
+                
+            };
+                              const projectData = projects[project];
+            if (projectData) {
+                document.getElementById('modalTitle').textContent = projectData.title;
+                document.getElementById('modalDescription').textContent = projectData.description;
+                document.getElementById('modalScale').textContent = projectData.scale;
+                document.getElementById('modalDate').textContent = projectData.date;
+                document.getElementById('modalLocation').textContent = projectData.location;
+                document.getElementById('modalPhilosophy').textContent = projectData.philosophy;
+                
+                if (projectData.video) {
+                    modalVideo.src = projectData.video;
+                    modalVideo.style.display = 'block';
+                    modalImage.style.display = 'none';
+                } else {
+                    modalImage.src = projectData.image;
+                    modalImage.style.display = 'block';
+                    modalVideo.style.display = 'none';
+                }
+                
+                modal.classList.add('active');
+            }
+        }
+
+        // Cosmic Audio
+        const cosmicAudio = document.getElementById('cosmicAudio');
+        const toggleMusic = document.getElementById('toggleMusic');
+        let audioEnabled = false;
+
+        toggleMusic.addEventListener('click', () => {
+            if (audioEnabled) {
+                cosmicAudio.pause();
+                toggleMusic.innerHTML = '<i class="fas fa-music mr-2"></i>Cosmic Sound';
+            } else {
+                cosmicAudio.play().catch(e => {
+                    console.log("Audio play failed:", e);
+                    // Auto-play was prevented, we'll handle it on user interaction
+                    toggleMusic.innerHTML = '<i class="fas fa-play mr-2"></i>Enable Sound';
+                });
+                toggleMusic.innerHTML = '<i class="fas fa-pause mr-2"></i>Pause Sound';
+            }
+            audioEnabled = !audioEnabled;
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate eternal items on scroll
+            gsap.utils.toArray('.eternal-item').forEach((item, i) => {
+                gsap.fromTo(item, 
+                    { opacity: 0, y: 100, rotationY: 10 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        rotationY: 0,
+                        duration: 1,
+                        delay: i * 0.1,
+                        scrollTrigger: {
+                            trigger: item,
+                            start: 'top 80%',
+                            toggleActions: 'play none none reverse'
+                        }
+                    }
+                );
+            });
+
+            // Parallax effect
+            gsap.to('.cosmic-bg', {
+                yPercent: -50,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.infinite-scroll',
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+
+        // Utility Functions
+        function scrollToProjects() {
+            gsap.to(window, { duration: 2, scrollTo: '#projects', ease: 'power2.inOut' });
+        }
+
+        function startImmersion() {
+            const preloader = document.getElementById('quantum-preloader');
+            preloader.style.opacity = '1';
+            preloader.style.visibility = 'visible';
+            
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                scrollToProjects();
+            }, 1500);
+        }
+
+        // Create cosmic particles
+        function createCosmicParticles() {
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'cosmic-particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                document.querySelector('.infinite-scroll').appendChild(particle);
+            }
+        }
+
+        createCosmicParticles();
+    </script>
+</body>
+</html>
