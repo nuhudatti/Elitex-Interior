@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Elitex CMS — Admin Dashboard</title>
+    <link rel="icon" href="../meta.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <!-- ============ Login / first-run setup ============ -->
+    <div class="login-screen" id="loginScreen" style="display:none">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="mark">E</div>
+                <div>
+                    <h1>ELITEX CMS</h1>
+                    <p>Content Management</p>
+                </div>
+            </div>
+            <h2 id="loginTitle" style="font-size:17px;margin-bottom:6px">Welcome back</h2>
+            <p id="loginSub" style="font-size:12.5px;color:var(--text-3);margin-bottom:22px">Sign in to manage your website.</p>
+            <form id="loginForm" autocomplete="off">
+                <div class="field">
+                    <label for="loginName">Name</label>
+                    <input class="input" id="loginName" placeholder="Your name" autocomplete="username">
+                </div>
+                <div class="field">
+                    <label for="loginPass">Password</label>
+                    <input class="input" id="loginPass" type="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <p id="loginErr" style="color:var(--red);font-size:12px;min-height:18px;margin:4px 0 10px"></p>
+                <button class="btn btn-primary" id="loginBtn" type="submit" style="width:100%;justify-content:center;padding:11px">Sign in</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============ App shell ============ -->
+    <div class="shell" id="shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="mark">E</div>
+                <div>
+                    <b>ELITEX CMS</b>
+                    <span>Admin Dashboard</span>
+                </div>
+            </div>
+            <div class="site-switch">
+                <span class="dot"></span>
+                <div>
+                    <b>Elitex Interior</b>
+                    <span>elitexinterior.com</span>
+                </div>
+            </div>
+            <nav class="nav-scroll" id="navScroll" aria-label="Main navigation"></nav>
+            <div class="sidebar-foot">
+                <span>v2.0</span>
+                <span><span class="kbd">Ctrl K</span> commands</span>
+            </div>
+        </aside>
+        <div class="scrim" id="scrim"></div>
+
+        <div class="main">
+            <header class="topbar">
+                <button class="icon-btn hamburger" id="hamburger" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+                <div class="search-box" id="searchBox" role="button" tabindex="0" aria-label="Search and commands">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <span>Search or jump to…</span>
+                    <span class="kbd">Ctrl K</span>
+                </div>
+                <div class="topbar-actions">
+                    <div class="dirty-pill" id="dirtyPill" title="You have unpublished changes">
+                        <span class="dot"></span> Unpublished changes
+                    </div>
+                    <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge" id="notifDot"></span>
+                    </button>
+                    <button class="avatar" id="userAvatar" aria-label="Account">?</button>
+                </div>
+            </header>
+
+            <main class="content" id="content">
+                <div id="viewHost"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ============ Notifications panel ============ -->
+    <div class="notif-panel" id="notifPanel">
+        <div class="head">
+            Notifications
+            <button class="btn btn-sm btn-ghost" id="notifClear">Clear</button>
+        </div>
+        <div class="list" id="notifList">
+            <div class="notif-empty">No notifications</div>
+        </div>
+    </div>
+
+    <!-- Modals are created dynamically (stackable) — see core.js -->
+
+    <!-- ============ Command palette ============ -->
+    <div class="palette-backdrop" id="paletteBackdrop">
+        <div class="palette">
+            <input id="paletteInput" placeholder="Type a command or search…" autocomplete="off">
+            <div class="palette-list" id="paletteList"></div>
+        </div>
+    </div>
+
+    <!-- ============ Toasts ============ -->
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <script src="js/core.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/views.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

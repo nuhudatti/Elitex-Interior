@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Elitex Interior — shared public styles (skeletons, lazy media, helpers)
+   Loaded by every public page. Visual design of the pages is unchanged.
+   ========================================================================== */
+
+/* ---- Skeleton loading placeholders ---- */
+.skel {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(100deg, rgba(148, 148, 148, 0.12) 40%, rgba(201, 169, 110, 0.18) 50%, rgba(148, 148, 148, 0.12) 60%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.4s ease-in-out infinite;
+  border-radius: 15px;
+  min-height: 100%;
+}
+@keyframes skel-shimmer {
+  to { background-position-x: -200%; }
+}
+.skel-dark { background-color: rgba(255, 255, 255, 0.04); }
+
+/* ---- Progressive media loading ---- */
+.lazy-media {
+  background-size: cover;
+  background-position: center;
+}
+.lazy-media img,
+.lazy-media video {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.lazy-media.is-loaded img,
+.lazy-media.is-loaded video {
+  opacity: 1;
+}
+
+/* ---- Draft badge (visible only in admin live preview) ---- */
+.cms-draft-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  background: rgba(245, 158, 11, 0.95);
+  color: #1a1a1a;
+  font: 700 11px/1 'Inter', sans-serif;
+  letter-spacing: 0.08em;
+  padding: 5px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ---- Preview mode indicator ---- */
+.cms-preview-bar {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  background: rgba(10, 15, 26, 0.92);
+  border: 1px solid rgba(201, 169, 110, 0.5);
+  color: #e8d9b5;
+  font: 600 12px/1 'Inter', sans-serif;
+  letter-spacing: 0.06em;
+  padding: 9px 16px;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.cms-preview-bar .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: cms-pulse 1.6s ease-in-out infinite;
+}
+@keyframes cms-pulse {
+  50% { opacity: 0.35; }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}

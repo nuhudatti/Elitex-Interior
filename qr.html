@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIWES Logbook QR Codes</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto;
+            padding: 20mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #1e3a8a;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #1e3a8a;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #4b5563;
+            font-size: 16px;
+        }
+        
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            flex-grow: 1;
+            margin-bottom: 25px;
+        }
+        
+        .qr-item {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-code {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .qr-label {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 16px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .instructions {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .instructions h3 {
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .print-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .print-button:hover {
+            background: #0f2a5e;
+            transform: translateY(-2px);
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .a4-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 15mm;
+                width: 100%;
+                min-height: 100%;
+            }
+            
+            .print-button {
+                display: none;
+            }
+            
+            .instructions {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .a4-container {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="a4-container">
+        <!-- <div class="header">
+            <h1>SIWES Digital Progress Tracker</h1>
+            <p>Scan QR codes to access my SIWES progress documentation</p>
+        </div> -->
+        
+        <!-- <div class="instructions">
+            <h3>Instructions for Use</h3>
+            <ul>
+                <li>Print this page on A4 paper</li>
+                <li>Cut out each QR code along the borders</li>
+                <li>Paste one QR code on each page of your SIWES logbook</li>
+                <li>When scanned, the QR code will direct to my progress documentation</li>
+            </ul>
+        </div> -->
+        
+        <div class="qr-grid">
+            <!-- <div class="qr-item">
+                <div class="qr-code" id="qrcode1"></div>
+                <div class="qr-label">Logbook Page 1</div>
+            </div> -->
+
+            <div class="qr-item">
+  <div class="qr-code" id="qrcode1"></div>
+  <!-- <div class="qr-label">Logbook Page 1</div> -->
+  <div class="qr-description">
+    <strong>🔗 Scan to View the 5IRE Legacy Proposal</strong><br>
+    <em>An Original Innovation by Nuhu Muhammad Datti</em><br><br>
+    Developed during my <strong>6-month SIWES Internship</strong>, this project represents my 
+    <strong>independent research and practical application</strong> of knowledge gained under 
+    the <strong>5IRE Movement</strong> at <strong>NCAIR</strong>.<br>
+    <em>📘 A personal contribution to Nigeria’s digital innovation legacy.</em>
+  </div>
+</div>
+
+
+<div class="qr-item">
+  <div class="qr-code" id="qrcode2"></div>
+  <!-- <div class="qr-label">Logbook Page 1</div> -->
+  <div class="qr-description">
+    <strong>🔗 Scan to View the 5IRE Legacy Proposal</strong><br>
+    <em>An Original Innovation by Nuhu Muhammad Datti</em><br><br>
+    Developed during my <strong>6-month SIWES Internship</strong>, this project represents my 
+    <strong>independent research and practical application</strong> of knowledge gained under 
+    the <strong>5IRE Movement</strong> at <strong>NCAIR</strong>.<br>
+    <em>📘 A personal contribution to Nigeria’s digital innovation legacy.</em>
+  </div>
+</div>
+
+<!--             
+            <div class="qr-item">
+                <div class="qr-code" id="qrcode2"></div>
+                <div class="qr-label">Logbook Page 2</div>
+            </div>
+            
+            <div class="qr-item">
+                <div class="qr-code" id="qrcode3"></div>
+                <div class="qr-label">Logbook Page 3</div>
+            </div>
+            
+            <div class="qr-item">
+                <div class="qr-code" id="qrcode4"></div>
+                <div class="qr-label">Logbook Page 4</div>
+            </div>
+            
+            <div class="qr-item">
+                <div class="qr-code" id="qrcode5"></div>
+                <div class="qr-label">Logbook Page 5</div>
+            </div>
+            
+            <div class="qr-item">
+                <div class="qr-code" id="qrcode6"></div>
+                <div class="qr-label">Logbook Page 6</div>
+            </div> -->
+        </div>
+        
+        <!-- <div class="footer">
+            <p>Nuhu Muhammad Datti | SIWES Program | 5IRE Legacy Portal</p>
+        </div> -->
+    </div>
+
+    <button class="print-button" onclick="window.print()">
+        <i class="fas fa-print"></i>
+        Print This Page
+    </button>
+
+    <script>
+        // Replace with your actual progress page URL
+        const progressUrl = 'https://nuhudatti.github.io/ula-project-proposal/index.html#terms';
+        
+        // Generate 6 identical QR codes
+        document.addEventListener('DOMContentLoaded', function() {
+            for (let i = 1; i <= 6; i++) {
+                new QRCode(document.getElementById(`qrcode${i}`), {
+                    text: progressUrl,
+                    width: 140,
+                    height: 140,
+                    colorDark: "#1e3a8a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -8,24 +8,33 @@
     
     <!-- Global Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://nuhudatti.github.io/Elitex-Interior/reviews">
+    <meta property="og:url" content="https://elitexinterior.com/reviews.html">
     <meta property="og:title" content="Client Reviews | Elitex Interior | Beyond Design Excellence">
     <meta property="og:description" content="Where client experiences become eternal testaments to design mastery">
-    <meta property="og:image" content="meta-reviews.png">
+    <meta property="og:image" content="meta.png">
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Client Reviews | Elitex Interior">
     <meta property="twitter:description" content="Where client experiences become eternal testaments to design mastery">
-    <meta property="twitter:image" content="meta-reviews.png">
-    
-    <!-- Advanced Resources -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta property="twitter:image" content="meta.png">
+    <link rel="icon" href="meta.png" sizes="any">
+
+    <!-- Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" href="content/content.json" as="fetch" crossorigin>
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+
+    <link rel="stylesheet" href="css/site.css">
+    <script defer src="js/site.js"></script>
     
     <style>
         :root {
@@ -948,7 +957,7 @@
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased" data-page="reviews">
 
     <!-- Quantum Preloader -->
     <div id="quantum-preloader">
@@ -980,273 +989,54 @@
     <main class="infinite-scroll">
         <!-- Hero Section -->
         <section class="max-w-7xl mx-auto text-center mb-16">
-            <h1 class="quantum-title floating-element">
+            <h1 class="quantum-title floating-element" data-cms="rev-hero-title">
                 CLIENT <span style="background: var(--eternal-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">EXPERIENCES</span>
             </h1>
-            <p class="section-subtitle">
+            <p class="section-subtitle" data-cms="rev-hero-subtitle">
                 Discover why Abuja's most discerning clients trust Elitex Interior to transform their spaces. 
                 Read authentic testimonials from those who have experienced our revolutionary design approach.
             </p>
             
             <!-- Stats Section -->
-            <div class="stats-container">
-                <div class="stat-card floating-element" style="animation-delay: 0.2s;">
-                    <div class="stat-number" data-target="270">0+</div>
-                    <div class="stat-label">Projects Completed</div>
-                </div>
-                <div class="stat-card floating-element" style="animation-delay: 0.4s;">
-                    <div class="stat-number" data-target="250">0+</div>
-                    <div class="stat-label">Satisfied Clients</div>
-                </div>
-                <div class="stat-card floating-element" style="animation-delay: 0.6s;">
-                    <div class="stat-number" data-target="4.9">0</div>
-                    <div class="stat-label">Average Rating</div>
-                </div>
-                <div class="stat-card floating-element" style="animation-delay: 0.8s;">
-                    <div class="stat-number" data-target="5">0+</div>
-                    <div class="stat-label">Years Experience</div>
-                </div>
+            <div class="stats-container" data-cms="rev-stats">
+                <div class="skel skel-dark" style="height:140px"></div>
+                <div class="skel skel-dark" style="height:140px"></div>
+                <div class="skel skel-dark" style="height:140px"></div>
+                <div class="skel skel-dark" style="height:140px"></div>
             </div>
         </section>
 
         <!-- Text Reviews Section -->
         <section class="max-w-7xl mx-auto mb-16">
-            <h2 class="quantum-title">VOICES OF EXCELLENCE</h2>
-            <p class="section-subtitle">
+            <h2 class="quantum-title" data-cms="rev-cards-heading">VOICES OF EXCELLENCE</h2>
+            <p class="section-subtitle" data-cms="rev-cards-subtitle">
                 Read what our clients have to say about their journey with Elitex Interior
             </p>
             
-            <div class="review-grid">
-                <!-- Review 1 -->
-                <div class="review-card floating-element" data-project="ruwaidis">
-                    <div class="review-header">
-                        <img src="./vid/ruwaidis.jpg" alt="Client" class="client-avatar">
-                        <div class="    client-info">
-                            <h3>Founder & CEO</h3>
-                            <p>Elitex Interior & Ruwaidis Veil</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        A visionary designer redefining modern elegance in Abuja's luxury spaces. Through Elitex Interior, 
-                        she curates timeless environments that merge art, culture, and innovation. With Ruwaidis Veil, 
-                        she extends her creative mastery into fashion, celebrating the beauty of modest sophistication. 
-                        Her work embodies refinement, purpose, and an unyielding passion for excellence.
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="ruwaidis">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-
-                
-                
-                <!-- Review 2 -->
-                <div class="review-card floating-element" data-project="labiba">
-                    <div class="review-header">
-                        <img src="./vid/kadija.jpg" alt="Labiba Kabir" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Labiba Kabir</h3>
-                            <p>Global Asoebi Couture</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        Elitex Interior brought Global Asoebi Couture's vision to life with a space that radiates elegance and creativity. 
-                        Every corner reflects the spirit of luxury fashion and the artistry that defines our brand. Their attention to detail 
-                        and understanding of our aesthetic was remarkable from start to finish.
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="labiba">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-
-                <!-- 0 -->
-
-                <div class="review-card floating-element" data-project="aisha">
-                    <div class="review-header">
-                        <img src="./vid/aishek.jpg" alt="Client" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Aisha Kabir</h3>
-                            <p>Aysherk
-VeilShop</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        Elitex Interior transformed VeilShop into a luxurious and inspiring space that perfectly reflects our brand’s elegance. Every detail, from lighting to layout, showcases creativity and sophistication. Their dedication to understanding our vision made the experience seamless and exceptional.
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="aisha">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-                
-                
-                
-                <!-- Review 4 -->
-                <div class="review-card floating-element" data-project="muktar">
-                    <div class="review-header">
-                        <img src="./vid/mukky.jpg" alt="Muktar Kabir" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Muktar Kabir</h3>
-                            <p>ACE DRIL Exclusive Eyewear</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        Elitex Interior captured my brand's essence flawlessly. From the ACE DRIL Exclusive Eyewear studio to the Luxe Hangers space, 
-                        every detail reflects precision, luxury, and identity. Truly exceptional craftsmanship that elevated our brand presence.
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="muktar">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
-
-                <!-- Review 3 -->
-                <div class="review-card floating-element" data-project="executive-office">
-                    <div class="review-header">
-                        <img src="./vid/stem2.jpg" alt="Haajara Kabeer" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Haajara Kabeer</h3>
-                            <p>Science & Engineering Professional</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        From the custom furniture to the lighting design, every element was perfect. True artisans and professionals. 
-                        Highly recommended for any luxury project. They transformed my living space into a sanctuary that balances 
-                        functionality with breathtaking aesthetics.
-                    </p>
-                    <!-- <a href="#" class="project-link view-project-btn" data-project="executive-office">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a> -->
-                </div>
-                
-                <!-- Review 5 -->
-                <!-- <div class="review-card floating-element" data-project="sophisticated">
-                    <div class="review-header">
-                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Aisha Bello" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Aisha Bello</h3>
-                            <p>Residential Client</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        Working with Elitex Interior was a transformative experience. They took my vague ideas and turned them into a home 
-                        that exceeds all my expectations. The team was professional, creative, and attentive to every detail. I couldn't be happier!
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="sophisticated">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div> -->
-                
-                <!-- Review 6 -->
-                <!-- <div class="review-card floating-element" data-project="contemporary-office">
-                    <div class="review-header">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Chinedu Okoro" class="client-avatar">
-                        <div class="client-info">
-                            <h3>Chinedu Okoro</h3>
-                            <p>Corporate Office Client</p>
-                        </div>
-                    </div>
-                    <div class="rating">
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                        <span class="star filled"><i class="fas fa-star"></i></span>
-                    </div>
-                    <p class="review-text">
-                        Elitex Interior transformed our corporate office into a space that inspires creativity and productivity. 
-                        The design perfectly balances professionalism with modern aesthetics. Our employees love coming to work now!
-                    </p>
-                    <a href="#" class="project-link view-project-btn" data-project="contemporary-office">
-                        View Project <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div> -->
+            <div class="review-grid" data-cms="rev-cards">
+                <div class="skel skel-dark" style="height:320px"></div>
+                <div class="skel skel-dark" style="height:320px"></div>
+                <div class="skel skel-dark" style="height:320px"></div>
             </div>
         </section>
 
         <!-- Video Testimonials Section -->
         <section class="max-w-7xl mx-auto mb-16">
-            <h2 class="quantum-title">IN THEIR OWN WORDS</h2>
-            <p class="section-subtitle">
+            <h2 class="quantum-title" data-cms="rev-video-heading">IN THEIR OWN WORDS</h2>
+            <p class="section-subtitle" data-cms="rev-video-subtitle">
                 Watch our clients share their experiences with Elitex Interior
             </p>
             
-            <div class="video-testimonials">
-                <!-- Video 1 -->
-                <div class="video-testimonial floating-element" data-video="./vid/vid2.mp4">
-                    <video muted playsinline loop>
-                        <source src="./vid/vid2.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-overlay">
-                        <h3 class="text-lg font-bold">RUWAYDIS VEils Client</h3>
-                        <p class="text-gray-300 text-sm">Fashion meets interior design excellence</p>
-                    </div>
-                    <div class="play-btn">
-                        <i class="fas fa-play"></i>
-                    </div>
-                </div>
-                
-                <!-- Video 2 -->
-                <div class="video-testimonial floating-element" data-video="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198496/vid4_le6khu.mp4">
-                    <video muted playsinline loop>
-                        <source src="https://res.cloudinary.com/dpdmb5t1l/video/upload/v1760198496/vid4_le6khu.mp4" type="video/mp4">
-                    </video>
-                    <div class="video-overlay">
-                        <h3 class="text-lg font-bold">Residential Client</h3>
-                        <p class="text-gray-300 text-sm">Transforming living spaces</p>
-                    </div>
-                    <div class="play-btn">
-                        <i class="fas fa-play"></i>
-                    </div>
-                </div>
+            <div class="video-testimonials" data-cms="rev-videos">
+                <div class="skel skel-dark" style="height:280px"></div>
+                <div class="skel skel-dark" style="height:280px"></div>
             </div>
         </section>
 
         <!-- Submit Review Section -->
         <section id="submit-review" class="max-w-4xl mx-auto">
-            <h2 class="quantum-title">SHARE YOUR EXPERIENCE</h2>
-            <p class="section-subtitle">
-                We value your feedback. Share your Elitex Interior experience with others.
-            </p>
+            <h2 class="quantum-title" data-cms="rev-form-heading">SHARE YOUR EXPERIENCE</h2>
+            <p class="section-subtitle" data-cms="rev-form-subtitle">We value your feedback. Share your Elitex Interior experience with others.</p>
             
             <div class="review-form-container">
                 <form id="review-form" action="https://formspree.io/f/mgvnlqzg" method="POST">
@@ -1312,12 +1102,12 @@ VeilShop</p>
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-8 md:mb-12">
                 <div class="col-span-1 md:col-span-2 lg:col-span-1">
-                    <h4 class="text-xl font-bold text-white mb-4">ELITEX INTERIOR</h4>
-                    <p class="text-white/60 text-sm md:text-base">Crafting timeless and elegant interiors in Abuja. We transform spaces into bespoke environments that reflect your personality and lifestyle.</p>
+                    <h4 class="text-xl font-bold text-white mb-4" data-cms="footer-brand">ELITEX INTERIOR</h4>
+                    <p class="text-white/60 text-sm md:text-base" data-cms="footer-blurb">Crafting timeless and elegant interiors in Abuja. We transform spaces into bespoke environments that reflect your personality and lifestyle.</p>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold text-white mb-4">Quick Links</h4>
-                    <ul class="space-y-2 md:space-y-3">
+                    <ul class="space-y-2 md:space-y-3" id="footer-quicklinks">
                         <li><a href="index.html#about" class="hover:text-[var(--secondary)] transition-colors text-sm md:text-base">About Us</a></li>
                         <li><a href="index.html#services" class="hover:text-[var(--secondary)] transition-colors text-sm md:text-base">Services</a></li>
                         <li><a href="project.html" class="hover:text-[var(--secondary)] transition-colors text-sm md:text-base">Portfolio</a></li>
@@ -1327,23 +1117,20 @@ VeilShop</p>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold text-white mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
+                    <div class="flex space-x-4" data-cms="footer-social">
                         <a href="https://www.instagram.com/elitex_interior?igsh=MW95cnFzYWFreHp2dA==" aria-label="Instagram" class="text-xl md:text-2xl hover:text-[var(--secondary)] transition-colors"><i class="fab fa-instagram"></i></a>
-                        <a href="https://wa.me/2348034967299?text=Hello%20Elitex%20Interior%2C%20I%27m%20interested%20in%20your%20services." target="_blank" aria-label="WhatsApp" class="text-xl md:text-2xl hover:text-[var(--secondary)] transition-colors">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
                     </div>
                 </div>
                 <div>
                     <h4 class="text-lg font-semibold text-white mb-4">Contact Info</h4>
                     <div class="space-y-2 text-white/60 text-sm md:text-base">
-                        <p><i class="fas fa-map-marker-alt mr-2 text-[var(--secondary)]"></i> Suite A31 Shakir plaza, garki area 11, Abuja</p>
-                        <p><i class="fab fa-whatsapp mr-2 text-[var(--secondary)]"></i> 08034967299</p>
+                        <p><i class="fas fa-map-marker-alt mr-2 text-[var(--secondary)]"></i> <span data-cms="footer-address">Suite A31 Shakir plaza, garki area 11, Abuja</span></p>
+                        <p><i class="fab fa-whatsapp mr-2 text-[var(--secondary)]"></i> <span data-cms="footer-phone">08034967299</span></p>
                     </div>
                 </div>
             </div>
             <div class="border-t border-white/10 pt-6 text-center text-white/50 text-sm md:text-base">
-                <p>&copy; <span id="current-year"></span> Elitex Interior. All Rights Reserved. Crafted with Excellence.</p>
+                <p data-cms="footer-copy">&copy; 2025 Elitex Interior. All Rights Reserved. Crafted with Excellence.</p>
             </div>
         </div>
     </footer>
@@ -1356,7 +1143,7 @@ VeilShop</p>
         <div class="modal-content">
             <div class="modal-body">
                 <div class="modal-media">
-                    <video id="modalVideo" class="w-full h-full" controls>
+                    <video id="modalVideo" class="w-full h-full" controls playsinline>
                         Your browser does not support the video tag.
                     </video>
                     <img id="modalImage" class="w-full h-full hidden" alt="Project Image">
@@ -1402,274 +1189,6 @@ VeilShop</p>
         </div>
     </div>
 
-    <script>
-        // Quantum Preloader
-        window.addEventListener('load', () => {
-            const preloader = document.getElementById('quantum-preloader');
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                preloader.style.visibility = 'hidden';
-            }, 2000);
-        });
-
-        // GSAP Animations
-        gsap.registerPlugin(ScrollTrigger);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Animate review cards on scroll
-            gsap.utils.toArray('.review-card, .video-testimonial, .stat-card').forEach((item, i) => {
-                gsap.fromTo(item, 
-                    { opacity: 0, y: 50 },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.8,
-                        delay: i * 0.1,
-                        scrollTrigger: {
-                            trigger: item,
-                            start: 'top 85%',
-                            toggleActions: 'play none none reverse'
-                        }
-                    }
-                );
-            });
-
-            // Counter animation for stats
-            const counters = document.querySelectorAll('.stat-number');
-            counters.forEach(counter => {
-                const target = parseFloat(counter.getAttribute('data-target'));
-                const suffix = counter.textContent.replace(/[0-9.]/g, '');
-                const duration = 2000;
-                let start = 0;
-                const increment = target / (duration / 16);
-                
-                const updateCounter = () => {
-                    if (start < target) {
-                        start += increment;
-                        if (target % 1 !== 0) {
-                            // For decimal numbers like 4.9
-                            counter.textContent = start.toFixed(1) + suffix;
-                        } else {
-                            counter.textContent = Math.ceil(start) + suffix;
-                        }
-                        setTimeout(updateCounter, 16);
-                    } else {
-                        if (target % 1 !== 0) {
-                            counter.textContent = target.toFixed(1) + suffix;
-                        } else {
-                            counter.textContent = target + suffix;
-                        }
-                    }
-                };
-                
-                ScrollTrigger.create({
-                    trigger: counter,
-                    start: 'top 80%',
-                    onEnter: updateCounter,
-                    once: true
-                });
-            });
-
-            // Set current year in footer
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-        });
-
-        // Video Testimonial Functionality
-        const videoTestimonials = document.querySelectorAll('.video-testimonial');
-        const videoModal = document.getElementById('projectModal');
-        const modalVideo = document.getElementById('modalVideo');
-        const modalImage = document.getElementById('modalImage');
-        const closeModal = document.getElementById('modalClose');
-
-        videoTestimonials.forEach(video => {
-            video.addEventListener('click', () => {
-                const videoSrc = video.getAttribute('data-video');
-                modalVideo.src = videoSrc;
-                modalVideo.style.display = 'block';
-                modalImage.style.display = 'none';
-                
-                // Set modal content for video
-                document.getElementById('modalTitle').textContent = video.querySelector('.video-overlay h3').textContent;
-                document.getElementById('modalDescription').textContent = video.querySelector('.video-overlay p').textContent;
-                document.getElementById('modalScale').textContent = 'Video Testimonial';
-                document.getElementById('modalDate').textContent = 'Recent Project';
-                document.getElementById('modalLocation').textContent = 'Abuja, Nigeria';
-                document.getElementById('modalPhilosophy').textContent = 'This testimonial captures the authentic experience of our client, showcasing the transformative power of our design philosophy in their own words.';
-                
-                videoModal.classList.add('active');
-                modalVideo.play();
-            });
-        });
-
-        // Project Modal for View Project buttons
-        const viewProjectButtons = document.querySelectorAll('.view-project-btn');
-        
-        // Project data
-        const projects = {
-            'ruwaidis': {
-                title: 'RUWAYDIS VEils',
-                description: 'A revolutionary space where fashion architecture meets interior design. Every curve tells a story of elegance and innovation. The RUWAYDIS VEils project redefines luxury retail spaces by blending architectural precision with artistic expression.',
-                scale: 'Luxury Boutique - 450 sqm',
-                date: 'Completed 2025',
-                location: 'Abuja, Nigeria',
-                philosophy: 'This project embodies the harmony between form and function, where every element serves both aesthetic and practical purposes. We believe that luxury is not about excess, but about thoughtful curation and meticulous attention to detail.',
-                video: './vid/vid2.mp4'
-            },
-            
-            'labiba': {
-    title: 'Global Asoebi Couture',
-    description: 'A luxurious fashion workspace where elegance meets creativity. Elitex Interior brought Global Asoebi Couture’s vision to life through a design that radiates sophistication and artistry.',
-    scale: 'Fashion Studio - 450 sqm',
-    date: 'Completed 2014',
-    location: 'Abuja, Nigeria',
-    philosophy: 'Every corner was crafted to embody the spirit of luxury fashion and the creative essence of the brand. From textures to lighting, every detail reflects refined taste and an unwavering dedication to perfection.',
-    video: './vid/asebi.mp4'
-},
-
-'aisha': {
-    title: 'Aysherk VeilShop',
-    description: 'A refined fusion of fashion and elegance. Elitex Interior transformed VeilShop into a luxurious and inspiring space that embodies the brand’s sophistication and creative spirit.',
-    scale: 'Fashion Boutique - 320 sqm',
-    date: 'Completed 2024',
-    location: 'Abuja, Nigeria',
-    philosophy: 'Every detail—from lighting to spatial flow—was thoughtfully designed to elevate the shopping experience. The result is a seamless blend of modern luxury and timeless grace, reflecting Aysherk VeilShop’s commitment to elegance and individuality.',
-    image: './vid/aysherk.jpg'
-},
-
-
-            'muktar': {
-                title: 'Luxe Hangers',
-                description: 'Transforming retail into an immersive luxury experience. Where every hanger holds a story of sophistication. The Luxe Hangers concept store creates an environment where products become art and shopping becomes an experience.',
-                scale: 'Retail Space - 280 sqm',
-                date: 'Completed 2023',
-                location: 'Abuja, Nigeria',
-                philosophy: 'We challenged the conventional retail experience by creating a space that feels more like a gallery than a store. The design encourages exploration and discovery, turning each visit into a memorable journey.',
-                image: 'https://res.cloudinary.com/dpdmb5t1l/image/upload/v1760198481/img2_jrpwdr.jpg'
-            },
-            
-        };
-
-        viewProjectButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const projectId = button.getAttribute('data-project');
-                const project = projects[projectId];
-                
-                if (project) {
-                    document.getElementById('modalTitle').textContent = project.title;
-                    document.getElementById('modalDescription').textContent = project.description;
-                    document.getElementById('modalScale').textContent = project.scale;
-                    document.getElementById('modalDate').textContent = project.date;
-                    document.getElementById('modalLocation').textContent = project.location;
-                    document.getElementById('modalPhilosophy').textContent = project.philosophy;
-                    
-                    if (project.video) {
-                        modalVideo.src = project.video;
-                        modalVideo.style.display = 'block';
-                        modalImage.style.display = 'none';
-                    } else {
-                        modalImage.src = project.image;
-                        modalImage.style.display = 'block';
-                        modalVideo.style.display = 'none';
-                    }
-                    
-                    videoModal.classList.add('active');
-                    
-                    if (project.video) {
-                        modalVideo.play();
-                    }
-                }
-            });
-        });
-
-        closeModal.addEventListener('click', () => {
-            videoModal.classList.remove('active');
-            modalVideo.pause();
-        });
-
-        // Close modal when clicking outside content
-        videoModal.addEventListener('click', (e) => {
-            if (e.target === videoModal) {
-                videoModal.classList.remove('active');
-                modalVideo.pause();
-            }
-        });
-
-        // Review Form Submission
-        const reviewForm = document.getElementById('review-form');
-        const formStatus = document.getElementById('form-status');
-
-        reviewForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitButton = reviewForm.querySelector('.submit-btn');
-            const originalText = submitButton.innerHTML;
-            
-            // Show loading state
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
-            submitButton.disabled = true;
-            
-            const formData = new FormData(reviewForm);
-            
-            try {
-                const response = await fetch(reviewForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    formStatus.textContent = 'Thank you for your review! It has been submitted successfully.';
-                    formStatus.className = 'form-status success';
-                    reviewForm.reset();
-                    
-                    // Reset star rating
-                    document.querySelectorAll('.star-input').forEach(star => {
-                        star.checked = false;
-                    });
-                    
-                    // Scroll to form status
-                    formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    formStatus.textContent = 'There was an error submitting your review. Please try again.';
-                    formStatus.className = 'form-status error';
-                }
-            } catch (error) {
-                formStatus.textContent = 'There was an error submitting your review. Please check your connection and try again.';
-                formStatus.className = 'form-status error';
-            } finally {
-                // Reset button state
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-            }
-        });
-
-        // Star rating interaction
-        document.querySelectorAll('.star-label').forEach(star => {
-            star.addEventListener('click', () => {
-                const starId = star.getAttribute('for');
-                document.getElementById(starId).checked = true;
-            });
-        });
-
-        // Create cosmic particles
-        function createCosmicParticles() {
-            const container = document.querySelector('.infinite-scroll');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'cosmic-particle';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.top = Math.random() * 100 + 'vh';
-                particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.width = Math.random() * 3 + 2 + 'px';
-                particle.style.height = particle.style.width;
-                container.appendChild(particle);
-            }
-        }
-
-        createCosmicParticles();
-    </script>
+    
 </body>
 </html>
