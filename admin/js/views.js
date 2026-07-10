@@ -14,6 +14,8 @@
 
   function bindInputs(root) {
     $$('[data-path]', root).forEach(function (input) {
+      if (input.dataset.bound === '1') return;
+      input.dataset.bound = '1';
       var handler = function () {
         var value;
         if (input.dataset.type === 'bool') value = input.checked;
@@ -1451,8 +1453,8 @@
         '<div class="field"><label>Branch</label><input class="input" id="stBranch" value="' + esc(s.branch) + '"></div>' +
         '<div class="field"><label>Fine-grained access token</label><input class="input" type="password" id="stToken" placeholder="' + (s.githubTokenEnc ? '•••••••• (saved, encrypted)' : 'github_pat_…') + '">' +
         '<div class="hint">Create at github.com → Settings → Developer settings → Fine-grained tokens. Give it access to only this repository with <b>Contents: Read and write</b>. It is stored encrypted with your password and never leaves this browser.</div></div>' +
-        '<button class="btn btn-primary btn-sm" id="stSaveGit"><i class="fas fa-check"></i> Save publishing settings</button> ' +
-        '<button class="btn btn-sm" id="stTestGit"><i class="fas fa-plug"></i> Test connection</button></div>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="stSaveGit"><i class="fas fa-check"></i> Save publishing settings</button> ' +
+        '<button type="button" class="btn btn-sm" id="stTestGit"><i class="fas fa-plug"></i> Test connection</button></div>' +
 
         '<div class="card"><h3 style="margin-bottom:12px"><i class="fas fa-cloud" style="color:var(--gold);margin-right:8px"></i>Cloudinary</h3>' +
         CMS.fText('Cloud name', 'site.integrations.cloudinary.cloudName', cld.cloudName) +
@@ -1472,7 +1474,10 @@
 
       bindInputs(el);
 
-      $('#stSaveGit', el).addEventListener('click', function () {
+      var saveGitBtn = $('#stSaveGit', el);
+      saveGitBtn.addEventListener('click', function () {
+        if (saveGitBtn.disabled) return;
+        saveGitBtn.disabled = true;
         s.repo = $('#stRepo', el).value.trim();
         s.branch = $('#stBranch', el).value.trim() || 'main';
         var tok = $('#stToken', el).value.trim();
@@ -1480,16 +1485,24 @@
           CMS.store.saveSettings();
           CMS.store.audit('settings', 'Publishing settings updated');
           CMS.toast('Publishing settings saved', 'success');
+          saveGitBtn.disabled = false;
         };
-        if (tok) { CMS.github.setToken(tok).then(finish); } else { finish(); }
+        var fail = function (err) {
+          CMS.toast(err.message || 'Could not save token', 'error');
+          saveGitBtn.disabled = false;
+        };
+        if (tok) { CMS.github.setToken(tok).then(finish).catch(fail); }
+        else { finish(); }
       });
 
       $('#stTestGit', el).addEventListener('click', function () {
         var btn = this;
+        if (btn.disabled) return;
+        var repo = $('#stRepo', el).value.trim() || CMS.store.settings.repo;
         btn.disabled = true;
-        CMS.github.api('/repos/' + CMS.store.settings.repo)
-          .then(function (repo) {
-            CMS.toast('Connected to ' + repo.full_name + ' ✓', 'success');
+        CMS.github.api('/repos/' + repo)
+          .then(function (repoInfo) {
+            CMS.toast('Connected to ' + repoInfo.full_name + ' ✓', 'success');
           })
           .catch(function (err) { CMS.toast(err.message, 'error'); })
           .then(function () { btn.disabled = false; });

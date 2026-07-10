@@ -74,7 +74,6 @@
     setToken: function (plain) {
       return CMS.auth.encryptSecret(plain).then(function (encd) {
         CMS.store.settings.githubTokenEnc = encd;
-        CMS.store.saveSettings();
         GitHub.token = plain;
       });
     },
@@ -106,7 +105,12 @@
 
     /* base64 that survives unicode */
     b64: function (str) {
-      return btoa(String.fromCharCode.apply(null, Array.prototype.slice.call(new TextEncoder().encode(str))));
+      var bytes = new TextEncoder().encode(str);
+      var chunks = [];
+      for (var i = 0; i < bytes.length; i += 0x8000) {
+        chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)));
+      }
+      return btoa(chunks.join(''));
     },
 
     /**

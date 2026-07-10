@@ -139,6 +139,9 @@
 
     /* ---------------- chrome (topbar etc.) ---------------- */
     bindChrome: function () {
+      if (App._chromeBound) return;
+      App._chromeBound = true;
+
       $('#hamburger').addEventListener('click', function () {
         $('#sidebar').classList.add('open');
         $('#scrim').classList.add('show');

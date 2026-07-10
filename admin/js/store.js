@@ -14,10 +14,13 @@
   var VERSIONS_KEY = 'elitexcms.versions.v1';
   var AUDIT_KEY = 'elitexcms.audit.v1';
   var SETTINGS_KEY = 'elitexcms.settings.v1';
+  var SETTINGS_KEYS = ['repo', 'branch', 'githubTokenEnc', 'sessionTimeout', 'previewPage'];
 
   var Store = {
     published: null,
     draft: null,
+    _settingsCache: '',
+    _savingSettings: false,
     settings: {
       repo: 'nuhudatti/Elitex-Interior',
       branch: 'main',
@@ -26,11 +29,18 @@
       previewPage: 'index.html'
     },
 
+    settingsPayload: function () {
+      var out = {};
+      SETTINGS_KEYS.forEach(function (k) { out[k] = Store.settings[k]; });
+      return out;
+    },
+
     /* ---------- boot ---------- */
     load: function () {
       try {
         var s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
         if (s) Object.assign(Store.settings, s);
+        Store._settingsCache = JSON.stringify(Store.settingsPayload());
       } catch (e) {}
       CMS.auth.timeoutMinutes = Store.settings.sessionTimeout || 30;
 
@@ -48,8 +58,18 @@
     },
 
     saveSettings: function () {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(Store.settings));
-      CMS.auth.timeoutMinutes = Store.settings.sessionTimeout || 30;
+      if (Store._savingSettings) return;
+      Store._savingSettings = true;
+      try {
+        var json = JSON.stringify(Store.settingsPayload());
+        if (json !== Store._settingsCache) {
+          localStorage.setItem(SETTINGS_KEY, json);
+          Store._settingsCache = json;
+        }
+        CMS.auth.timeoutMinutes = Store.settings.sessionTimeout || 30;
+      } finally {
+        Store._savingSettings = false;
+      }
     },
 
     /* ---------- draft mutations ---------- */
