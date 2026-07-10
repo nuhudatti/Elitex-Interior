@@ -187,9 +187,9 @@
       });
 
       /* dirty pill + live preview push on every draft change */
-      document.addEventListener('cms:change', function () {
+      document.addEventListener('cms:change', function (e) {
         $('#dirtyPill').classList.toggle('show', CMS.store.isDirty());
-        App.pushPreview();
+        if (!(e.detail && e.detail.skipPreview)) App.pushPreview();
       });
       $('#dirtyPill').addEventListener('click', function () { App.go('publish'); });
       $('#dirtyPill').style.cursor = 'pointer';

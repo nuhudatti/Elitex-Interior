@@ -89,7 +89,10 @@
             Accept: 'application/vnd.github+json',
             'X-GitHub-Api-Version': '2022-11-28'
           },
-          body: opts.body ? JSON.stringify(opts.body) : undefined
+          body: opts.body ? (function () {
+            try { return JSON.stringify(opts.body); }
+            catch (e) { throw new Error('Request payload is too large to send.'); }
+          })() : undefined
         });
       }).then(function (res) {
         if (res.status === 401) throw new Error('GitHub token is invalid or expired.');
@@ -103,14 +106,18 @@
       });
     },
 
-    /* base64 that survives unicode */
+    /* base64 for GitHub API — never use Function.apply on large byte arrays (stack overflow). */
     b64: function (str) {
       var bytes = new TextEncoder().encode(str);
-      var chunks = [];
-      for (var i = 0; i < bytes.length; i += 0x8000) {
-        chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)));
+      var len = bytes.length;
+      var binParts = [];
+      for (var i = 0; i < len; i += 8192) {
+        var end = Math.min(i + 8192, len);
+        var chunk = '';
+        for (var j = i; j < end; j++) chunk += String.fromCharCode(bytes[j]);
+        binParts.push(chunk);
       }
-      return btoa(chunks.join(''));
+      return btoa(binParts.join(''));
     },
 
     /**
@@ -118,31 +125,35 @@
      * to the configured repo/branch. GitHub Pages redeploys automatically.
      */
     publish: function (message, extraFiles) {
-      var repo = CMS.store.settings.repo;
-      var branch = CMS.store.settings.branch || 'main';
-      var json = JSON.stringify(CMS.store.draft, null, 2);
-      var files = [{ path: 'content/content.json', content: json }].concat(extraFiles || []);
+      return Promise.resolve().then(function () {
+        var repo = CMS.store.settings.repo;
+        var branch = CMS.store.settings.branch || 'main';
+        var json = CMS.store.draftJson();
+        var files = [{ path: 'content/content.json', content: json }].concat(extraFiles || []);
 
-      var commitOne = function (file) {
-        var apiPath = '/repos/' + repo + '/contents/' + file.path;
-        return GitHub.api(apiPath + '?ref=' + encodeURIComponent(branch), { allow404: true })
-          .then(function (existing) {
-            return GitHub.api(apiPath, {
-              method: 'PUT',
-              body: {
-                message: message || ('cms: update ' + file.path),
-                content: GitHub.b64(file.content),
-                branch: branch,
-                sha: existing && existing.sha ? existing.sha : undefined
-              }
+        var commitOne = function (file) {
+          var apiPath = '/repos/' + repo + '/contents/' + file.path;
+          var encoded;
+          try { encoded = GitHub.b64(file.content); }
+          catch (e) { throw new Error('Content encoding failed for ' + file.path); }
+          return GitHub.api(apiPath + '?ref=' + encodeURIComponent(branch), { allow404: true })
+            .then(function (existing) {
+              return GitHub.api(apiPath, {
+                method: 'PUT',
+                body: {
+                  message: message || ('cms: update ' + file.path),
+                  content: encoded,
+                  branch: branch,
+                  sha: existing && existing.sha ? existing.sha : undefined
+                }
+              });
             });
-          });
-      };
+        };
 
-      /* sequential to avoid ref race conditions */
-      return files.reduce(function (chain, f) {
-        return chain.then(function () { return commitOne(f); });
-      }, Promise.resolve());
+        return files.reduce(function (chain, f) {
+          return chain.then(function () { return commitOne(f); });
+        }, Promise.resolve());
+      });
     },
 
     history: function () {

@@ -1268,8 +1268,8 @@
         '<i class="fas ' + (dirty ? 'fa-circle-exclamation' : 'fa-circle-check') + '" style="font-size:22px;color:' + (dirty ? 'var(--amber)' : 'var(--green)') + '"></i>' +
         '<div style="flex:1;min-width:200px"><b>' + (dirty ? 'Unpublished changes in your draft' : 'Everything is published') + '</b>' +
         '<div class="sub">' + (dirty ? 'The live site still shows the previous version.' : 'Draft and live site are identical.') + '</div></div>' +
-        '<button class="btn" id="pbDiscard"' + (dirty ? '' : ' disabled') + '><i class="fas fa-rotate-left"></i> Discard draft</button>' +
-        '<button class="btn btn-primary" id="pbPublish"' + (dirty ? '' : ' disabled') + '><i class="fas fa-rocket"></i> Publish to live site</button></div>' +
+        '<button type="button" class="btn" id="pbDiscard"' + (dirty ? '' : ' disabled') + '><i class="fas fa-rotate-left"></i> Discard draft</button>' +
+        '<button type="button" class="btn btn-primary" id="pbPublish"' + (dirty ? '' : ' disabled') + '><i class="fas fa-rocket"></i> Publish to live site</button></div>' +
 
         '<div class="grid cols-2">' +
         '<div class="card"><h3 style="margin-bottom:4px">Local snapshots</h3><div class="sub" style="margin-bottom:12px">Saved in this browser. A snapshot is taken automatically before every publish and restore.</div>' +
@@ -1322,6 +1322,7 @@
       });
 
       $('#pbPublish', el).addEventListener('click', function () {
+        if (this.disabled) return;
         CMS.modal({
           title: 'Publish to live site',
           bodyHtml: '<div class="field"><label>Publish note (commit message)</label>' +
@@ -1345,8 +1346,9 @@
             CMS.app.notify('Site published — "' + msg + '"');
             CMS.app.rerender();
           }).catch(function (err) {
-            CMS.toast(err.message, 'error');
-            CMS.app.rerender();
+            CMS.toast((err && err.message) || 'Publish failed', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-rocket"></i> Publish to live site';
           });
         });
       });

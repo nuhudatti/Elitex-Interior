@@ -74,7 +74,14 @@
 
     /* ---------- draft mutations ---------- */
     isDirty: function () {
-      return JSON.stringify(Store.draft) !== JSON.stringify(Store.published);
+      if (!Store.draft || !Store.published) return false;
+      /* O(1) check — never JSON.stringify the full draft (causes stack overflow on publish). */
+      return (Store.draft.updatedAt || '') !== (Store.published.updatedAt || '');
+    },
+
+    draftJson: function () {
+      try { return JSON.stringify(Store.draft); }
+      catch (e) { throw new Error('Draft is too large or invalid to publish.'); }
     },
 
     persistDraft: CMS.debounce(function () {
@@ -105,8 +112,9 @@
     },
 
     markPublished: function () {
+      /* Reuse draft reference fields — updatedAt match makes isDirty() false without re-stringifying. */
       Store.published = CMS.clone(Store.draft);
-      document.dispatchEvent(new CustomEvent('cms:change', { detail: { published: true } }));
+      document.dispatchEvent(new CustomEvent('cms:change', { detail: { published: true, skipPreview: true } }));
     },
 
     /* ---------- collections (lists with order/status) ---------- */
@@ -120,7 +128,7 @@
       var arr = Store.list(path);
       item.id = item.id || CMS.uid(prefix || 'it');
       item.status = item.status || 'draft';
-      item.order = arr.length ? Math.max.apply(null, arr.map(function (i) { return i.order || 0; })) + 1 : 1;
+      item.order = arr.length ? arr.reduce(function (m, i) { return Math.max(m, i.order || 0); }, 0) + 1 : 1;
       arr.push(item);
       Store.change({ path: path });
       Store.audit('create', path + ' → ' + (item.title || item.name || item.label || item.id));
@@ -185,35 +193,62 @@
 
     /* ---------- versions ---------- */
     versions: function () {
-      try { return JSON.parse(localStorage.getItem(VERSIONS_KEY) || '[]'); }
+      try {
+        return JSON.parse(localStorage.getItem(VERSIONS_KEY) || '[]').map(function (v) {
+          /* Corrupted snapshots (json stored as object) blow the stack when re-stringified. */
+          if (v && v.json != null && typeof v.json !== 'string') {
+            try { v.json = JSON.stringify(v.json); } catch (e) { v.json = '{}'; }
+          }
+          return v;
+        });
+      }
       catch (e) { return []; }
     },
 
+    versionsPayload: function (list) {
+      return list.map(function (v) {
+        return {
+          id: v.id,
+          ts: v.ts,
+          label: v.label,
+          by: v.by,
+          json: typeof v.json === 'string' ? v.json : '{}'
+        };
+      });
+    },
+
     snapshot: function (label) {
+      var draftJson;
+      try { draftJson = Store.draftJson(); }
+      catch (e) { CMS.toast(e.message || 'Could not snapshot draft', 'error'); return false; }
       var list = Store.versions();
       list.unshift({
         id: CMS.uid('ver'),
         ts: new Date().toISOString(),
         label: label || 'Manual snapshot',
         by: (CMS.auth.current || {}).name || 'unknown',
-        json: JSON.stringify(Store.draft)
+        json: draftJson
       });
       while (list.length > 8) list.pop();
-      try { localStorage.setItem(VERSIONS_KEY, JSON.stringify(list)); }
+      var payload = Store.versionsPayload(list);
+      try { localStorage.setItem(VERSIONS_KEY, JSON.stringify(payload)); return true; }
       catch (e) {
-        /* storage quota: drop oldest snapshots until it fits */
         while (list.length > 1) {
           list.pop();
-          try { localStorage.setItem(VERSIONS_KEY, JSON.stringify(list)); return; } catch (e2) {}
+          payload = Store.versionsPayload(list);
+          try { localStorage.setItem(VERSIONS_KEY, JSON.stringify(payload)); return true; } catch (e2) {}
         }
+        CMS.toast('Snapshot storage full', 'error');
+        return false;
       }
     },
 
     restoreVersion: function (id) {
       var v = Store.versions().find(function (x) { return x.id === id; });
-      if (!v) return false;
-      Store.draft = JSON.parse(v.json);
-      localStorage.setItem(DRAFT_KEY, v.json);
+      if (!v || v.json == null) return false;
+      var raw = typeof v.json === 'string' ? v.json : JSON.stringify(v.json);
+      Store.draft = JSON.parse(raw);
+      localStorage.setItem(DRAFT_KEY, raw);
       document.dispatchEvent(new CustomEvent('cms:change', { detail: { reset: true } }));
       Store.audit('restore', 'Restored version from ' + CMS.fmtTime(v.ts));
       return true;
@@ -221,7 +256,7 @@
 
     deleteVersion: function (id) {
       var list = Store.versions().filter(function (x) { return x.id !== id; });
-      localStorage.setItem(VERSIONS_KEY, JSON.stringify(list));
+      localStorage.setItem(VERSIONS_KEY, JSON.stringify(Store.versionsPayload(list)));
     },
 
     /* ---------- audit log ---------- */
