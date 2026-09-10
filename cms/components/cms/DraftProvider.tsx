@@ -2,10 +2,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { cmsJson } from './api';
+import { useToast } from './Toast';
 import type { ContentDocumentData } from '@/lib/content';
 import { setPath } from '@/lib/content-path';
+import { changedSectionLabels } from '@/lib/draft-diff';
+import { friendlyError } from '@/lib/friendly-error';
 
-type UserInfo = {
+export type UserInfo = {
   id: string;
   name: string;
   email?: string | null;
@@ -18,8 +21,11 @@ type DraftContextValue = {
   content: ContentDocumentData | null;
   published: ContentDocumentData | null;
   dirty: boolean;
+  unpublished: boolean;
+  changedSections: string[];
   saving: boolean;
   publishing: boolean;
+  loading: boolean;
   error: string;
   message: string;
   user: UserInfo | null;
@@ -35,11 +41,13 @@ type DraftContextValue = {
 const DraftContext = createContext<DraftContextValue | null>(null);
 
 export function DraftProvider({ children }: { children: React.ReactNode }) {
+  const { push } = useToast();
   const [content, setContent] = useState<ContentDocumentData | null>(null);
   const [published, setPublished] = useState<ContentDocumentData | null>(null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -58,17 +66,31 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
       setDraftUpdatedAt(draft.json.updatedAt || null);
       setDirty(false);
     } else {
-      setError(draft.json.error || 'Could not load draft');
+      setError(draft.json.error || 'The draft could not be loaded. Check your connection and try again.');
     }
     if (pub.ok && pub.json.content) {
       setPublished(pub.json.content);
       setPublishedUpdatedAt(pub.json.updatedAt || null);
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    reload().catch(() => setError('Could not load draft'));
+    reload().catch(() => {
+      setError('The draft could not be loaded. Check your connection and try again.');
+      setLoading(false);
+    });
   }, [reload]);
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
 
   const setField = useCallback((path: string, value: unknown) => {
     setContent((current) => (current ? setPath(current, path, value) : current));
@@ -92,17 +114,31 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ content }),
       });
       if (!result.ok) {
-        setError(result.json.error || 'Save failed');
+        const text = result.json.error || 'Your draft could not be saved. Check your connection and try again.';
+        setError(text);
+        push(text, 'error');
         return false;
       }
       setDirty(false);
       setDraftUpdatedAt(typeof result.json.updatedAt === 'string' ? result.json.updatedAt : null);
-      setMessage('Draft saved. Published site unchanged.');
+      setMessage('Saved just now');
+      push('Draft saved');
       return true;
     } finally {
       setSaving(false);
     }
-  }, [content]);
+  }, [content, push]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        if (dirty && !saving) void saveDraft();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [dirty, saving, saveDraft]);
 
   const publish = useCallback(async () => {
     setPublishing(true);
@@ -114,24 +150,36 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
       }
       const result = await cmsJson('/api/cms/content/publish', { method: 'POST' });
       if (!result.ok) {
-        setError(result.json.error === 'forbidden' ? 'Publish requires an administrator or an explicit grant.' : result.json.error || 'Publish failed');
+        const text =
+          result.response.status === 403
+            ? "You don't have permission to publish changes."
+            : friendlyError(result.json.error, result.json.error || 'Changes could not be published.');
+        setError(text);
+        push(text, 'error');
         return false;
       }
-      setMessage('Published. Public GET /api/content now matches this draft.');
+      setMessage('Changes published');
+      push('Changes published');
       await reload();
       return true;
     } finally {
       setPublishing(false);
     }
-  }, [dirty, reload, saveDraft]);
+  }, [dirty, push, reload, saveDraft]);
+
+  const changedSections = useMemo(() => changedSectionLabels(content, published), [content, published]);
+  const unpublished = changedSections.length > 0;
 
   const value = useMemo(
     () => ({
       content,
       published,
       dirty,
+      unpublished,
+      changedSections,
       saving,
       publishing,
+      loading,
       error,
       message,
       user,
@@ -147,8 +195,11 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
       content,
       published,
       dirty,
+      unpublished,
+      changedSections,
       saving,
       publishing,
+      loading,
       error,
       message,
       user,

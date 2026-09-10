@@ -1,145 +1,225 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cmsJson } from '@/components/cms/api';
-import { MediaThumb, type MediaRow } from '@/components/cms/MediaPicker';
-import { uploadToCloudinary, type UploadConfig, type SignedParams } from '@/components/cms/uploader';
+import { ConfirmDialog } from '@/components/cms/ConfirmDialog';
+import { kindOf, type MediaRow } from '@/components/cms/MediaPicker';
+import { MediaThumb } from '@/components/cms/MediaThumb';
+import { UploadQueue } from '@/components/cms/UploadQueue';
+import { useToast } from '@/components/cms/Toast';
+import { formatBytes, formatDims, formatWhen } from '@/lib/format';
+
+const PAGE_SIZE = 48;
 
 export default function MediaPage() {
+  const { push } = useToast();
   const [rows, setRows] = useState<MediaRow[]>([]);
-  const [config, setConfig] = useState<UploadConfig | null>(null);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [progress, setProgress] = useState<number | null>(null);
   const [q, setQ] = useState('');
+  const [type, setType] = useState('');
+  const [sort, setSort] = useState('newest');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [selected, setSelected] = useState<string[]>([]);
+  const [detail, setDetail] = useState<MediaRow | null>(null);
+  const [remove, setRemove] = useState<{ ids: string[]; force?: boolean; referenced?: boolean } | null>(null);
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   async function load() {
-    const [media, upload] = await Promise.all([
-      cmsJson<{ media?: MediaRow[]; count?: number }>('/api/cms/media'),
-      cmsJson<UploadConfig>('/api/cms/media/upload-config'),
-    ]);
+    const media = await cmsJson<{ media?: MediaRow[] }>('/api/cms/media');
     if (media.ok) setRows(media.json.media || []);
-    else setError(media.json.error || 'Could not load media');
-    if (upload.ok) setConfig(upload.json);
+    else setError(media.json.error || 'The media library could not be loaded.');
   }
 
   useEffect(() => {
-    load().catch(() => setError('Could not load media'));
+    load().catch(() => setError('The media library could not be loaded.'));
   }, []);
 
-  async function onFiles(files: FileList | null) {
-    if (!files?.length || !config) return;
-    if (config.mode === 'unavailable') {
-      setError(`Upload blocked. Add ${config.missing.join(', ')} in cms/.env and Vercel (server-only).`);
-      return;
-    }
-    setError('');
-    for (const file of Array.from(files)) {
-      setProgress(0);
-      setMessage(`Uploading ${file.name}`);
-      let signed: SignedParams | null = null;
-      if (config.mode === 'signed') {
-        const sign = await cmsJson<SignedParams>('/api/cms/media/sign', {
-          method: 'POST',
-          body: JSON.stringify({ folder: config.folder }),
-        });
-        if (!sign.ok) {
-          setError(sign.json.error || 'Could not sign upload');
-          setProgress(null);
-          return;
-        }
-        signed = sign.json;
+  const filtered = useMemo(() => {
+    const next = rows.filter((row) => {
+      const kind = kindOf(row);
+      if (type && kind !== type) return false;
+      if (q && !`${row.originalFilename || ''} ${row.publicId || ''} ${row.url}`.toLowerCase().includes(q.toLowerCase())) {
+        return false;
       }
-      try {
-        const asset = await uploadToCloudinary(file, config, signed, (ratio) => setProgress(ratio));
-        if (!asset.secure_url || !asset.public_id) throw new Error('Cloudinary did not return a valid asset');
-        const complete = await cmsJson('/api/cms/media/complete', {
-          method: 'POST',
-          body: JSON.stringify({ ...asset, name: file.name, cloudName: config.cloudName }),
-        });
-        if (!complete.ok) throw new Error(complete.json.error || 'Neon save failed');
-        setMessage(`Saved ${file.name} to Neon. Draft media registry updated. Published unchanged.`);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Upload failed');
-        setProgress(null);
+      return true;
+    });
+    next.sort((a, b) => {
+      if (sort === 'name') return String(a.originalFilename || '').localeCompare(String(b.originalFilename || ''));
+      if (sort === 'oldest') return String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+      return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+    });
+    return next;
+  }, [q, rows, sort, type]);
+
+  const page = filtered.slice(0, visible);
+
+  function toggle(id: string) {
+    setSelected((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  }
+
+  async function copyUrls() {
+    const urls = rows.filter((row) => selected.includes(row.id)).map((row) => row.secureUrl || row.url);
+    await navigator.clipboard.writeText(urls.join('\n'));
+    push('Copied media references');
+  }
+
+  async function deleteIds(ids: string[], force = false) {
+    for (const id of ids) {
+      const result = await cmsJson(`/api/cms/media/${id}${force ? '?force=1' : ''}`, { method: 'DELETE' });
+      if (result.response.status === 409 && !force) {
+        setRemove({ ids, referenced: true });
+        return;
+      }
+      if (!result.ok) {
+        setError(result.json.error || 'That file could not be removed.');
         return;
       }
     }
-    setProgress(null);
+    setRemove(null);
+    setSelected([]);
+    setDetail(null);
+    push('Media removed from the library');
     await load();
   }
-
-  async function remove(row: MediaRow) {
-    if (!window.confirm(`Remove ${row.originalFilename || row.url} from the CMS library? Live pages that still reference it will be checked first.`)) {
-      return;
-    }
-    const result = await cmsJson(`/api/cms/media/${row.id}`, { method: 'DELETE' });
-    if (result.response.status === 409) {
-      const go = window.confirm('This asset is referenced by published content. Delete anyway? This can break a live page.');
-      if (!go) return;
-      const forced = await cmsJson(`/api/cms/media/${row.id}?force=1`, { method: 'DELETE' });
-      if (!forced.ok) {
-        setError(forced.json.error || 'Delete failed');
-        return;
-      }
-    } else if (!result.ok) {
-      setError(result.json.error || 'Delete failed');
-      return;
-    }
-    await load();
-  }
-
-  const filtered = rows.filter((row) => {
-    if (!q) return true;
-    return `${row.originalFilename || ''} ${row.url}`.toLowerCase().includes(q.toLowerCase());
-  });
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Media library</h1>
-          <p>Neon holds metadata. Cloudinary holds files. The original imported set is kept.</p>
-        </div>
-        <label className="btn btn-primary">
-          Upload
-          <input
-            type="file"
-            multiple
-            accept="image/*,video/*,audio/*,.mov,.mp4,.m4v,.webm"
-            style={{ display: 'none' }}
-            onChange={(e) => onFiles(e.target.files)}
-          />
-        </label>
+      <UploadQueue onComplete={() => load()} />
+      <div className="row" style={{ marginBottom: 14 }}>
+        <input className="input" placeholder="Search filename or public ID" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1 }} />
+        <select className="select" value={type} onChange={(e) => setType(e.target.value)} style={{ maxWidth: 140 }}>
+          <option value="">All types</option>
+          <option value="image">Images</option>
+          <option value="video">Videos</option>
+          <option value="audio">Audio</option>
+        </select>
+        <select className="select" value={sort} onChange={(e) => setSort(e.target.value)} style={{ maxWidth: 150 }}>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="name">Name</option>
+        </select>
+        <button className="btn" type="button" onClick={() => setView(view === 'grid' ? 'list' : 'grid')}>
+          {view === 'grid' ? 'List' : 'Grid'}
+        </button>
       </div>
-      {config?.mode === 'unavailable' ? (
-        <div className="banner">
-          Uploads are blocked until a Cloudinary credential exists. Add these server-only names in cms/.env and Vercel:{' '}
-          {(config.missing || []).join(', ')}. Cloud name stays dpdmb5t1l. Do not paste values into chat.
-        </div>
-      ) : (
-        <p className="hint">Upload mode: {config?.mode || '…'} · folder {config?.folder || 'elitex'}</p>
-      )}
       {error ? <p className="err">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
-      {progress != null ? <p>Upload {Math.round(progress * 100)}%</p> : null}
-      <input className="input" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBottom: 12 }} />
-      <p className="hint">{filtered.length} assets</p>
-      <div className="media-grid">
-        {filtered.map((row) => (
-          <div className="media-card" key={row.id}>
-            <MediaThumb url={row.secureUrl || row.url} type={row.resourceType} />
-            <div className="meta">
-              {row.originalFilename || row.publicId || row.id}
-              <div className="row" style={{ marginTop: 6 }}>
-                <button className="btn btn-danger" type="button" onClick={() => remove(row)}>
-                  Delete
+      <p className="hint">
+        {filtered.length} files · existing Cloudinary library is kept · new uploads are added only after they succeed
+      </p>
+      {selected.length ? (
+        <div className="bulk-bar">
+          <span>{selected.length} items selected</span>
+          <div className="row">
+            <button className="btn btn-sm" type="button" onClick={() => setSelected(filtered.map((row) => row.id))}>
+              Select all
+            </button>
+            <button className="btn btn-sm" type="button" onClick={() => setSelected([])}>
+              Clear selection
+            </button>
+            <button className="btn btn-sm" type="button" onClick={copyUrls}>
+              Copy references
+            </button>
+            <button className="btn btn-sm btn-danger" type="button" onClick={() => setRemove({ ids: selected })}>
+              Delete
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <div className={view === 'grid' ? 'media-grid' : 'collection'}>
+        {page.map((row) => {
+          const url = row.secureUrl || row.url;
+          const typeName = kindOf(row);
+          const on = selected.includes(row.id);
+          return view === 'grid' ? (
+            <button
+              type="button"
+              key={row.id}
+              className={`media-card ${on ? 'selected' : ''}`}
+              onClick={(event) => {
+                if (event.shiftKey || event.metaKey || event.ctrlKey) toggle(row.id);
+                else setDetail(row);
+              }}
+            >
+              <MediaThumb url={url} type={typeName} large />
+              <div className="meta">
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={() => toggle(row.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Select ${row.originalFilename || row.id}`}
+                />{' '}
+                {row.originalFilename || row.publicId || row.id}
+              </div>
+            </button>
+          ) : (
+            <div className="item-row" key={row.id}>
+              <MediaThumb url={url} type={typeName} />
+              <div>
+                <b>{row.originalFilename || row.publicId}</b>
+                <span>
+                  {typeName} · {formatDims(row.width, row.height)} · {formatBytes(row.bytes)}
+                </span>
+              </div>
+              <div className="row">
+                <input type="checkbox" checked={on} onChange={() => toggle(row.id)} />
+                <button className="btn btn-sm" type="button" onClick={() => setDetail(row)}>
+                  Details
                 </button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {visible < filtered.length ? (
+        <button className="btn" type="button" style={{ marginTop: 16 }} onClick={() => setVisible((n) => n + PAGE_SIZE)}>
+          Load more
+        </button>
+      ) : null}
+      {detail ? (
+        <div className="modal-backdrop" onClick={() => setDetail(null)}>
+          <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <MediaThumb url={detail.secureUrl || detail.url} type={kindOf(detail)} large />
+            <h3>{detail.originalFilename || 'Media'}</h3>
+            <p className="hint">
+              {kindOf(detail)} · {formatDims(detail.width, detail.height)} · {formatBytes(detail.bytes)} · added{' '}
+              {formatWhen(detail.createdAt)}
+            </p>
+            <details>
+              <summary className="hint">Technical details</summary>
+              <p className="hint">Public ID: {detail.publicId || '—'}</p>
+              <p className="hint">Folder: {detail.folder || 'elitex'}</p>
+              <p className="hint">{detail.secureUrl || detail.url}</p>
+            </details>
+            <div className="row" style={{ marginTop: 16, justifyContent: 'flex-end' }}>
+              <button className="btn" type="button" onClick={() => setDetail(null)}>
+                Close
+              </button>
+              <button
+                className="btn btn-danger"
+                type="button"
+                onClick={() => setRemove({ ids: [detail.id] })}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {remove ? (
+        <ConfirmDialog
+          title={remove.referenced ? 'This file is used on the live site' : 'Remove from the library?'}
+          body={
+            remove.referenced
+              ? 'Deleting it can leave a broken image or video on the published website. Continue only if you accept that.'
+              : 'The Cloudinary file may also be deleted. The live site is checked for references first.'
+          }
+          confirmLabel={remove.referenced ? 'Delete anyway' : 'Delete'}
+          danger
+          onCancel={() => setRemove(null)}
+          onConfirm={() => deleteIds(remove.ids, Boolean(remove.referenced))}
+        />
+      ) : null}
     </>
   );
 }

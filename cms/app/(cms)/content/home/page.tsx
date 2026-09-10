@@ -19,18 +19,13 @@ const TABS = [
 ];
 
 export default function HomeEditor() {
-  const { content } = useDraft();
+  const { content, loading } = useDraft();
   const [tab, setTab] = useState('hero');
-  if (!content) return <p>Loading draft…</p>;
+  if (loading || !content) return <div className="skeleton" style={{ height: 180 }} />;
+  const hero = (content.pages?.home as { hero?: Record<string, string> } | undefined)?.hero || {};
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Homepage</h1>
-          <p>Everything on index.html. Save draft does not change the live site.</p>
-        </div>
-      </div>
       <div className="tabs">
         {TABS.map(([id, label]) => (
           <button key={id} className={`tab ${tab === id ? 'active' : ''}`} type="button" onClick={() => setTab(id)}>
@@ -40,6 +35,15 @@ export default function HomeEditor() {
       </div>
       {tab === 'hero' ? (
         <div className="card">
+          <div className="hero-preview">
+            <div className="eyebrow">{String(hero.scrollHint || '')}</div>
+            <h2>{String(hero.title || '')}</h2>
+            <p>
+              {String(hero.taglinePrefix || '')}
+              <em>{String(hero.taglineHighlight || '')}</em>
+            </p>
+            <p className="hint">{String(hero.subtitle || '')}</p>
+          </div>
           <Field label="Main title" path="pages.home.hero.title" />
           <Field label="Tagline (before highlight)" path="pages.home.hero.taglinePrefix" />
           <Field label="Tagline highlight" path="pages.home.hero.taglineHighlight" />
@@ -97,13 +101,14 @@ export default function HomeEditor() {
             path="pages.home.portfolio.items"
             prefix="pf"
             addLabel="Add gallery item"
+            variant="cards"
             titleOf={(i) => String(i.title || '(no title)')}
             subtitleOf={(i) => `${i.mediaType || ''} · ${i.size || ''}`}
             fields={[
               { key: 'title', label: 'Title' },
               { key: 'subtitle', label: 'Subtitle' },
               { key: 'mediaType', label: 'Media type', type: 'select', options: ['image', 'video'] },
-              { key: 'src', label: 'Media file', type: 'media', kind: 'video' },
+              { key: 'src', label: 'Media file', type: 'media' },
               {
                 key: 'size',
                 label: 'Tile size',

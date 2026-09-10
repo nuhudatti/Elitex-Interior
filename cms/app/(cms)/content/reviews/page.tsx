@@ -6,18 +6,12 @@ import { CollectionEditor } from '@/components/cms/CollectionEditor';
 import { useDraft } from '@/components/cms/DraftProvider';
 
 export default function ReviewsPage() {
-  const { content } = useDraft();
+  const { content, loading } = useDraft();
   const [tab, setTab] = useState('cards');
-  if (!content) return <p>Loading draft…</p>;
+  if (loading || !content) return <div className="skeleton" style={{ height: 180 }} />;
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Reviews page</h1>
-          <p>reviews.html — cards, videos, hero stats, and the submit form.</p>
-        </div>
-      </div>
       <div className="tabs">
         {[
           ['cards', 'Review cards'],
@@ -40,6 +34,7 @@ export default function ReviewsPage() {
             path="pages.reviews.cards"
             prefix="rv"
             addLabel="Add review"
+            variant="cards"
             titleOf={(i) => String(i.name || '')}
             subtitleOf={(i) => String(i.company || '')}
             fields={[

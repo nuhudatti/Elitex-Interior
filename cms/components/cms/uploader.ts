@@ -45,13 +45,25 @@ function postChunk(
   form: FormData,
   headers: Record<string, string>,
   onProgress: (loaded: number, total: number) => void,
-  timeoutMs: number
+  timeoutMs: number,
+  signal?: AbortSignal
 ) {
   return new Promise<Record<string, unknown>>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
     Object.entries(headers).forEach(([key, value]) => xhr.setRequestHeader(key, value));
     xhr.timeout = timeoutMs || 0;
+    const abort = () => {
+      xhr.abort();
+      reject(new Error('Upload canceled'));
+    };
+    if (signal) {
+      if (signal.aborted) {
+        abort();
+        return;
+      }
+      signal.addEventListener('abort', abort, { once: true });
+    }
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress(event.loaded, event.total);
     };
@@ -68,6 +80,7 @@ function postChunk(
     };
     xhr.onerror = () => reject(new Error(parseCldError(xhr)));
     xhr.ontimeout = () => reject(new Error('Upload timed out. Keep this tab open and retry.'));
+    xhr.onabort = () => reject(new Error('Upload canceled'));
     xhr.send(form);
   });
 }
@@ -79,7 +92,7 @@ async function withRetries<T>(fn: () => Promise<T>) {
       return await fn();
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
-      const fatal = /preset not found|not configured|invalid/i.test(message);
+      const fatal = /preset not found|not configured|invalid|canceled/i.test(message);
       attempt += 1;
       if (fatal || attempt >= MAX_TRIES) throw error;
       await new Promise((resolve) => setTimeout(resolve, Math.min(1500 * attempt, 6000)));
@@ -91,7 +104,8 @@ export async function uploadToCloudinary(
   file: File,
   config: UploadConfig,
   signed: SignedParams | null,
-  onProgress: (ratio: number) => void
+  onProgress: (ratio: number) => void,
+  signal?: AbortSignal
 ) {
   if (config.mode === 'unavailable') {
     throw new Error(`Cloudinary upload is not configured. Missing: ${config.missing.join(', ')}`);
@@ -122,7 +136,14 @@ export async function uploadToCloudinary(
         form.append('timestamp', String(signed.timestamp));
         form.append('signature', signed.signature);
       }
-      return postChunk(url, form, headers, (loaded) => onProgress(Math.min((start + loaded) / (total || 1), 0.99)), last && rtype === 'video' ? 12 * 60 * 1000 : 0);
+      return postChunk(
+        url,
+        form,
+        headers,
+        (loaded) => onProgress(Math.min((start + loaded) / (total || 1), 0.99)),
+        last && rtype === 'video' ? 12 * 60 * 1000 : 0,
+        signal
+      );
     });
     if (!last && total > CHUNK) return sendRange(end + 1);
     onProgress(1);

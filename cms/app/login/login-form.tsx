@@ -24,13 +24,14 @@ export function LoginForm() {
       });
       const json = (await response.json()) as { ok?: boolean; error?: string };
       if (!response.ok || !json.ok) {
-        setError(json.error === 'invalid_credentials' ? 'Those details were not accepted.' : 'Sign-in failed.');
+        if (response.status === 429) setError('Too many sign-in attempts. Wait a few minutes and try again.');
+        else setError(json.error === 'invalid_credentials' ? 'Those details were not accepted.' : 'Sign-in failed. Check your connection and try again.');
         return;
       }
       router.replace(params.get('next') || '/dashboard');
       router.refresh();
     } catch {
-      setError('Sign-in failed.');
+        setError('Sign-in failed. Check your connection and try again.');
     } finally {
       setBusy(false);
     }

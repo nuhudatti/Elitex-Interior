@@ -6,18 +6,12 @@ import { CollectionEditor } from '@/components/cms/CollectionEditor';
 import { useDraft } from '@/components/cms/DraftProvider';
 
 export default function SitePage() {
-  const { content } = useDraft();
+  const { content, loading } = useDraft();
   const [tab, setTab] = useState('identity');
-  if (!content) return <p>Loading draft…</p>;
+  if (loading || !content) return <div className="skeleton" style={{ height: 180 }} />;
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Site info</h1>
-          <p>Shared across every public page. Saved as draft until you publish.</p>
-        </div>
-      </div>
       <div className="tabs">
         {[
           ['identity', 'Identity'],

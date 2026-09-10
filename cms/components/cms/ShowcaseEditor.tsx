@@ -5,17 +5,14 @@ import { CollectionEditor } from '@/components/cms/CollectionEditor';
 import { useDraft } from '@/components/cms/DraftProvider';
 
 export function ShowcaseEditor({ pageKey, fileName }: { pageKey: 'showcase' | 'showcase2'; fileName: string }) {
-  const { content } = useDraft();
-  if (!content) return <p>Loading draft…</p>;
+  const { content, loading } = useDraft();
+  if (loading || !content) return <div className="skeleton" style={{ height: 180 }} />;
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>{fileName}</h1>
-          <p>Gallery, headings, philosophy, and background audio.</p>
-        </div>
-      </div>
+      <p className="hint" style={{ marginTop: -8, marginBottom: 16 }}>
+        {fileName} — visual gallery, then project stories in Projects.
+      </p>
       <div className="card">
         <Field label="Hero title" path={`pages.${pageKey}.hero.title`} hint="Use <br> for a line break" />
         <Field label="Hero subtitle" path={`pages.${pageKey}.hero.subtitle`} type="textarea" />
@@ -32,13 +29,14 @@ export function ShowcaseEditor({ pageKey, fileName }: { pageKey: 'showcase' | 's
         path={`pages.${pageKey}.items`}
         prefix="sc"
         addLabel="Add gallery item"
+        variant="cards"
         titleOf={(i) => String(i.title || i.projectSlug || '(untitled)')}
         subtitleOf={(i) => `${i.mediaType || ''} · ${i.category || ''}`}
         fields={[
           { key: 'title', label: 'Overlay title' },
           { key: 'subtitle', label: 'Overlay subtitle' },
           { key: 'mediaType', label: 'Media type', type: 'select', options: ['video', 'image'] },
-          { key: 'src', label: 'Media file', type: 'media', kind: 'video' },
+          { key: 'src', label: 'Media file', type: 'media' },
           { key: 'category', label: 'Category', type: 'select', options: ['luxury', 'residential', 'commercial'] },
           { key: 'projectSlug', label: 'Project details slug' },
           { key: 'alt', label: 'Alt text' },

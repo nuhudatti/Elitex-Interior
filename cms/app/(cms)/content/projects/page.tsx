@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDraft } from '@/components/cms/DraftProvider';
+import type { ContentDocumentData } from '@/lib/content';
 import { SaveBar } from '@/components/cms/fields';
 import { MediaPicker } from '@/components/cms/MediaPicker';
-import { MediaThumb } from '@/components/cms/MediaPicker';
+import { MediaThumb } from '@/components/cms/MediaThumb';
+import { ConfirmDialog } from '@/components/cms/ConfirmDialog';
 
 type Detail = {
   title?: string;
@@ -18,9 +20,9 @@ type Detail = {
 };
 
 const MAPS = [
-  { id: 'showcase', label: 'project.html', path: 'pages.showcase.details' },
-  { id: 'showcase2', label: 'project2.html', path: 'pages.showcase2.details' },
-  { id: 'reviews', label: 'reviews.html', path: 'pages.reviews.details' },
+  { id: 'showcase', label: 'Showcase', path: 'pages.showcase.details' },
+  { id: 'showcase2', label: 'Showcase 2', path: 'pages.showcase2.details' },
+  { id: 'reviews', label: 'Reviews', path: 'pages.reviews.details' },
 ] as const;
 
 function getDetails(content: unknown, path: string): Record<string, Detail> {
@@ -29,25 +31,30 @@ function getDetails(content: unknown, path: string): Record<string, Detail> {
 }
 
 export default function ProjectsPage() {
-  const { content, replaceContent } = useDraft();
+  const { content, replaceContent, loading } = useDraft();
   const [mapId, setMapId] = useState<(typeof MAPS)[number]['id']>('showcase');
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [draftSlug, setDraftSlug] = useState('');
   const [form, setForm] = useState<Detail>({});
   const [picker, setPicker] = useState<'video' | 'image' | null>(null);
-  if (!content) return <p>Loading draft…</p>;
-
+  const [q, setQ] = useState('');
+  const [removeSlug, setRemoveSlug] = useState<string | null>(null);
   const map = MAPS.find((item) => item.id === mapId)!;
-  const details = getDetails(content, map.path);
+  const details = content ? getDetails(content, map.path) : {};
   const slugs = Object.keys(details);
+  const visible = useMemo(() => {
+    const term = q.toLowerCase();
+    return slugs.filter((slug) => `${slug} ${details[slug]?.title || ''} ${details[slug]?.location || ''}`.toLowerCase().includes(term));
+  }, [details, q, slugs]);
+
+  if (loading || !content) return <div className="skeleton" style={{ height: 180 }} />;
 
   function writeDetails(next: Record<string, Detail>) {
-    if (!content) return;
     const clone = structuredClone(content) as Record<string, unknown>;
     const pages = clone.pages as Record<string, Record<string, unknown>>;
     if (map.id === 'reviews') pages.reviews.details = next;
     else pages[map.id].details = next;
-    replaceContent(clone as typeof content);
+    replaceContent(clone as ContentDocumentData);
   }
 
   function save() {
@@ -58,14 +65,12 @@ export default function ProjectsPage() {
     setDraftSlug('');
   }
 
+  function duplicate(slug: string) {
+    writeDetails({ ...details, [`${slug}-copy`]: { ...details[slug], title: `${details[slug].title || slug} copy` } });
+  }
+
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Project details</h1>
-          <p>Modal content linked from gallery tiles and “View Project”.</p>
-        </div>
-      </div>
       <div className="tabs">
         {MAPS.map((item) => (
           <button key={item.id} className={`tab ${mapId === item.id ? 'active' : ''}`} type="button" onClick={() => setMapId(item.id)}>
@@ -73,43 +78,43 @@ export default function ProjectsPage() {
           </button>
         ))}
       </div>
-      <div className="collection">
-        {slugs.map((slug) => (
-          <div className="item-row" key={slug}>
-            <MediaThumb url={details[slug].video || details[slug].image || ''} />
-            <div>
-              <b>{details[slug].title || slug}</b>
-              <span>slug: {slug}</span>
+      <input className="input" placeholder="Search projects" value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBottom: 14 }} />
+      <div className="cards-grid">
+        {visible.map((slug) => (
+          <div className="visual-card" key={slug}>
+            <div className="cover">
+              <MediaThumb url={details[slug].video || details[slug].image || ''} large />
             </div>
-            <span />
-            <div className="row">
-              <button
-                className="btn"
-                type="button"
-                onClick={() => {
-                  setEditingSlug(slug);
-                  setForm({ ...details[slug] });
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="btn btn-danger"
-                type="button"
-                onClick={() => {
-                  const next = { ...details };
-                  delete next[slug];
-                  writeDetails(next);
-                }}
-              >
-                Delete
-              </button>
+            <div className="pad">
+              <b>{details[slug].title || slug}</b>
+              <span>
+                {details[slug].location || slug}
+                {details[slug].date ? ` · ${details[slug].date}` : ''}
+              </span>
+              <div className="row" style={{ marginTop: 8 }}>
+                <button
+                  className="btn btn-sm"
+                  type="button"
+                  onClick={() => {
+                    setEditingSlug(slug);
+                    setForm({ ...details[slug] });
+                  }}
+                >
+                  Edit
+                </button>
+                <button className="btn btn-sm" type="button" onClick={() => duplicate(slug)}>
+                  Duplicate
+                </button>
+                <button className="btn btn-sm btn-danger" type="button" onClick={() => setRemoveSlug(slug)}>
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
       <button
-        className="btn"
+        className="btn btn-primary"
         type="button"
         style={{ marginTop: 12 }}
         onClick={() => {
@@ -118,24 +123,31 @@ export default function ProjectsPage() {
           setForm({});
         }}
       >
-        Add project
+        New Project
       </button>
       {editingSlug !== null ? (
         <div className="modal-backdrop" onClick={() => setEditingSlug(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h3>{editingSlug ? `Edit ${editingSlug}` : 'New project'}</h3>
             {!editingSlug ? (
               <div className="field">
                 <label>Slug</label>
                 <input className="input" value={draftSlug} onChange={(e) => setDraftSlug(e.target.value)} />
+                <div className="hint">Used by gallery tiles as projectSlug. Keep it short, lowercase, no spaces.</div>
               </div>
             ) : null}
-            {(['title', 'scale', 'date', 'location'] as const).map((key) => (
-              <div className="field" key={key}>
-                <label>{key}</label>
-                <input className="input" value={String(form[key] || '')} onChange={(e) => setForm({ ...form, [key]: e.target.value })} />
-              </div>
-            ))}
+            <div className="field">
+              <label>Title</label>
+              <input className="input" value={String(form.title || '')} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            </div>
+            <div className="grid cols-2">
+              {(['scale', 'date', 'location'] as const).map((key) => (
+                <div className="field" key={key}>
+                  <label>{key === 'scale' ? 'Scale' : key === 'date' ? 'Date' : 'Location'}</label>
+                  <input className="input" value={String(form[key] || '')} onChange={(e) => setForm({ ...form, [key]: e.target.value })} />
+                </div>
+              ))}
+            </div>
             <div className="field">
               <label>Description</label>
               <textarea className="textarea" value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} />
@@ -148,9 +160,8 @@ export default function ProjectsPage() {
               <label>Video</label>
               <div className="row">
                 <MediaThumb url={form.video || ''} type="video" />
-                <input className="input" style={{ flex: 1 }} value={form.video || ''} onChange={(e) => setForm({ ...form, video: e.target.value })} />
-                <button className="btn" type="button" onClick={() => setPicker('video')}>
-                  Library
+                <button className="btn btn-primary" type="button" onClick={() => setPicker('video')}>
+                  Choose media
                 </button>
               </div>
             </div>
@@ -158,9 +169,8 @@ export default function ProjectsPage() {
               <label>Image</label>
               <div className="row">
                 <MediaThumb url={form.image || ''} type="image" />
-                <input className="input" style={{ flex: 1 }} value={form.image || ''} onChange={(e) => setForm({ ...form, image: e.target.value })} />
-                <button className="btn" type="button" onClick={() => setPicker('image')}>
-                  Library
+                <button className="btn btn-primary" type="button" onClick={() => setPicker('image')}>
+                  Choose media
                 </button>
               </div>
             </div>
@@ -182,6 +192,21 @@ export default function ProjectsPage() {
           onPick={(url) => {
             setForm({ ...form, [picker]: url });
             setPicker(null);
+          }}
+        />
+      ) : null}
+      {removeSlug ? (
+        <ConfirmDialog
+          title="Remove this project story?"
+          body="Gallery tiles that still point at this slug will no longer open a story until you publish a replacement."
+          confirmLabel="Remove"
+          danger
+          onCancel={() => setRemoveSlug(null)}
+          onConfirm={() => {
+            const next = { ...details };
+            delete next[removeSlug];
+            writeDetails(next);
+            setRemoveSlug(null);
           }}
         />
       ) : null}

@@ -115,7 +115,14 @@ async function main() {
   const csrf = csrfFromCookie(cookie);
   assert(cookie.includes('elitex_session='), 'session cookie missing');
   assert(Boolean(csrf), 'csrf cookie missing');
-  results.push('valid login set httpOnly session cookie');
+  const sessionHeader =
+    (login.response.headers.getSetCookie?.() || []).find((item) =>
+      item.toLowerCase().startsWith('elitex_session=')
+    ) || '';
+  assert(/httponly/i.test(sessionHeader), 'session cookie not HttpOnly');
+  assert(/secure/i.test(sessionHeader), 'session cookie not Secure');
+  assert(/samesite=lax/i.test(sessionHeader), 'session cookie not SameSite=Lax');
+  results.push('valid login set HttpOnly Secure SameSite=Lax session cookie');
 
   const me = await req('GET', '/api/auth/me', { cookie });
   assert(me.status === 200, `me ${me.status}`);
@@ -167,7 +174,10 @@ async function main() {
   results.push('expired session rejected');
 
   const relogin = await req('POST', '/api/auth/login', { body: { email: EMAIL, password: PASSWORD } });
-  assert(relogin.status === 200, 'relogin failed');
+  assert(
+    relogin.status === 200,
+    `relogin failed ${relogin.status} ${String(relogin.json.error || '')}`
+  );
   const adminCookie = relogin.cookie;
   const adminCsrf = csrfFromCookie(adminCookie);
 

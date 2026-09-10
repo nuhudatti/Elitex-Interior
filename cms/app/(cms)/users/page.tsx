@@ -2,6 +2,8 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { cmsJson } from '@/components/cms/api';
+import { ConfirmDialog } from '@/components/cms/ConfirmDialog';
+import { useToast } from '@/components/cms/Toast';
 
 type CmsUser = {
   id: string;
@@ -14,33 +16,31 @@ type CmsUser = {
 };
 
 export default function UsersPage() {
+  const { push } = useToast();
   const [users, setUsers] = useState<CmsUser[]>([]);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [form, setForm] = useState({ email: '', name: '', password: '', role: 'editor', canPublish: false });
+  const [removeId, setRemoveId] = useState<string | null>(null);
 
   async function load() {
     const result = await cmsJson<{ users?: CmsUser[] }>('/api/cms/users');
     if (result.ok) setUsers(result.json.users || []);
-    else setError(result.json.error || 'Could not load users');
+    else setError(result.json.error || "You don't have permission to manage users.");
   }
 
   useEffect(() => {
-    load().catch(() => setError('Could not load users'));
+    load().catch(() => setError('Users could not be loaded.'));
   }, []);
 
   async function onCreate(event: FormEvent) {
     event.preventDefault();
-    const result = await cmsJson('/api/cms/users', {
-      method: 'POST',
-      body: JSON.stringify(form),
-    });
+    const result = await cmsJson('/api/cms/users', { method: 'POST', body: JSON.stringify(form) });
     if (!result.ok) {
-      setError(result.json.error || 'Create failed');
+      setError(result.json.error || 'That person could not be added.');
       return;
     }
-    setMessage('User created');
     setForm({ email: '', name: '', password: '', role: 'editor', canPublish: false });
+    push('Editor added');
     await load();
   }
 
@@ -51,22 +51,27 @@ export default function UsersPage() {
       body: JSON.stringify({ canPublish: !user.canPublishGrant }),
     });
     if (!result.ok) {
-      setError(result.json.error || 'Update failed');
+      setError(result.json.error || 'That permission could not be updated.');
       return;
     }
     await load();
   }
 
+  async function remove() {
+    if (!removeId) return;
+    const result = await cmsJson(`/api/cms/users/${removeId}`, { method: 'DELETE' });
+    if (!result.ok) {
+      setError(result.json.error || 'That person could not be removed.');
+      return;
+    }
+    setRemoveId(null);
+    push('User removed');
+    await load();
+  }
+
   return (
     <>
-      <div className="page-head">
-        <div>
-          <h1>Users</h1>
-          <p>Administrators manage accounts. Editors need an explicit publish grant.</p>
-        </div>
-      </div>
       {error ? <p className="err">{error}</p> : null}
-      {message ? <p className="ok">{message}</p> : null}
       <div className="card" style={{ padding: 0 }}>
         <table className="table">
           <thead>
@@ -75,6 +80,7 @@ export default function UsersPage() {
               <th>Email</th>
               <th>Role</th>
               <th>Publish</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -82,15 +88,24 @@ export default function UsersPage() {
               <tr key={user.id}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user.roleLabel}</td>
+                <td>
+                  <span className="chip">{user.roleLabel}</span>
+                </td>
                 <td>
                   {user.role === 'owner' ? (
                     'Always'
                   ) : (
-                    <button className="btn" type="button" onClick={() => togglePublish(user)}>
+                    <button className="btn btn-sm" type="button" onClick={() => togglePublish(user)}>
                       {user.canPublishGrant ? 'Granted' : 'Not granted'}
                     </button>
                   )}
+                </td>
+                <td>
+                  {user.role === 'editor' ? (
+                    <button className="btn btn-sm btn-danger" type="button" onClick={() => setRemoveId(user.id)}>
+                      Remove
+                    </button>
+                  ) : null}
                 </td>
               </tr>
             ))}
@@ -98,38 +113,52 @@ export default function UsersPage() {
         </table>
       </div>
       <form className="card" onSubmit={onCreate}>
-        <h3>Add user</h3>
+        <h3>Add an Editor</h3>
         <div className="field">
-          <label>Name</label>
-          <input className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <label htmlFor="new-name">Name</label>
+          <input id="new-name" className="input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </div>
         <div className="field">
-          <label>Email</label>
-          <input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <label htmlFor="new-email">Email</label>
+          <input id="new-email" className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="field">
-          <label>Password (12+ characters)</label>
-          <input className="input" type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+          <label htmlFor="new-pass">Password (12+ characters)</label>
+          <input
+            id="new-pass"
+            className="input"
+            type="password"
+            required
+            minLength={12}
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
         </div>
         <div className="field">
-          <label>Role</label>
-          <select className="select" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+          <label htmlFor="new-role">Role</label>
+          <select id="new-role" className="select" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
             <option value="editor">Editor</option>
             <option value="owner">Administrator</option>
           </select>
         </div>
         <div className="field" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <input
-            type="checkbox"
-            checked={form.canPublish}
-            onChange={(e) => setForm({ ...form, canPublish: e.target.checked })}
-          />
-          <label style={{ margin: 0 }}>Grant publish (editors only)</label>
+          <input type="checkbox" checked={form.canPublish} onChange={(e) => setForm({ ...form, canPublish: e.target.checked })} />
+          <label style={{ margin: 0 }}>Allow this Editor to publish</label>
         </div>
         <button className="btn btn-primary" type="submit">
-          Create user
+          Create
         </button>
       </form>
+      {removeId ? (
+        <ConfirmDialog
+          title="Remove this person?"
+          body="They will no longer be able to sign in. Content history is kept."
+          confirmLabel="Remove"
+          danger
+          onCancel={() => setRemoveId(null)}
+          onConfirm={remove}
+        />
+      ) : null}
     </>
   );
 }

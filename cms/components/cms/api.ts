@@ -1,5 +1,7 @@
 'use client';
 
+import { friendlyError } from '@/lib/friendly-error';
+
 export type ApiJson = Record<string, unknown>;
 
 function csrfToken() {
@@ -32,7 +34,22 @@ export async function cmsFetch(path: string, init: RequestInit = {}) {
 }
 
 export async function cmsJson<T extends ApiJson = ApiJson>(path: string, init: RequestInit = {}) {
-  const response = await cmsFetch(path, init);
-  const json = (await response.json()) as T & { ok?: boolean; error?: string };
-  return { response, json, ok: response.ok && json.ok !== false };
+  try {
+    const response = await cmsFetch(path, init);
+    const json = (await response.json()) as T & { ok?: boolean; error?: string };
+    return {
+      response,
+      json: {
+        ...json,
+        error: json.error ? friendlyError(json.error, json.error) : json.error,
+      },
+      ok: response.ok && json.ok !== false,
+    };
+  } catch {
+    return {
+      response: new Response(null, { status: 0 }),
+      json: { error: 'Check your connection and try again.' } as T & { ok?: boolean; error?: string },
+      ok: false,
+    };
+  }
 }
