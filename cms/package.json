@@ -19,8 +19,13 @@
     "import:content": "tsx scripts/import-content.ts",
     "check:db": "tsx scripts/check-db.ts",
     "phase1:init": "prisma migrate deploy && npm run import:content",
+    "auth:bootstrap": "tsx scripts/bootstrap-admin.ts",
     "test:content": "tsx scripts/validate-content-shape.ts",
     "test:phase2": "tsx scripts/verify-phase2.ts",
+    "test:phase3a": "tsx scripts/verify-phase3a.ts",
+    "test:phase3b": "tsx scripts/verify-phase3b.ts",
+    "test:phase3c": "tsx scripts/verify-phase3c.ts",
+    "test:phase4": "tsx scripts/verify-phase4.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

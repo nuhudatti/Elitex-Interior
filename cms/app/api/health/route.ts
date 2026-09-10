@@ -52,7 +52,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       service: 'elitex-cms-api',
-      phase: 1,
+      phase: 4,
       db: {
         connected: true,
         latencyMs: Date.now() - started,
@@ -71,7 +71,7 @@ export async function GET() {
       {
         ok: false,
         service: 'elitex-cms-api',
-        phase: 1,
+        phase: 4,
         db: {
           connected: false,
           latencyMs: Date.now() - started,

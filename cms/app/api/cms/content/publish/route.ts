@@ -1,14 +1,15 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { ACTOR_PHASE2, jsonError, jsonOk, logSafe, publicDbError } from '@/lib/api';
-import { requireCmsKey } from '@/lib/cms-auth';
+import { jsonError, jsonOk, logSafe, publicDbError } from '@/lib/api';
+import { actorLabel, actorUserId, requireCmsAccess } from '@/lib/auth';
+import { writeAudit } from '@/lib/audit';
 import { parseContent, withTimestamp } from '@/lib/content';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const gate = requireCmsKey(request);
+  const gate = await requireCmsAccess(request, { permission: 'content.publish' });
   if (!gate.ok) return gate.response;
 
   try {
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
     }
 
     const next = withTimestamp(parsed.data);
+    const actor = actorLabel(gate.actor);
 
     const result = await prisma.$transaction(async (tx) => {
       const published = await tx.contentDocument.upsert({
@@ -48,23 +50,21 @@ export async function POST(request: Request) {
           documentId: published.id,
           label: 'Published',
           data: next as Prisma.InputJsonValue,
+          createdById: actorUserId(gate.actor),
         },
         select: { id: true, createdAt: true },
       });
 
-      const audit = await tx.auditLog.create({
-        data: {
-          action: 'publish',
-          entity: 'ContentDocument',
-          entityId: published.id,
-          detail: 'Published draft to published ContentDocument',
-          metadata: {
-            actor: ACTOR_PHASE2,
-            versionId: version.id,
-            schemaVersion: next.schemaVersion,
-          },
+      const audit = await writeAudit(tx, gate.actor, {
+        action: 'publish',
+        entity: 'ContentDocument',
+        entityId: published.id,
+        detail: 'Published draft to published ContentDocument',
+        metadata: {
+          actor,
+          versionId: version.id,
+          schemaVersion: next.schemaVersion,
         },
-        select: { id: true, createdAt: true },
       });
 
       return { published, version, audit };
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       publishedId: result.published.id,
       versionId: result.version.id,
       auditId: result.audit.id,
-      actor: ACTOR_PHASE2,
+      actor,
       updatedAt: result.published.updatedAt.toISOString(),
     });
   } catch (error) {

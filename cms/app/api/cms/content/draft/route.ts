@@ -1,14 +1,15 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { jsonError, jsonOk, logSafe, publicDbError } from '@/lib/api';
-import { requireCmsKey } from '@/lib/cms-auth';
+import { actorLabel, requireCmsAccess } from '@/lib/auth';
+import { writeAuditStandalone } from '@/lib/audit';
 import { parseContent, withTimestamp } from '@/lib/content';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const gate = requireCmsKey(request);
+  const gate = await requireCmsAccess(request, { permission: 'content.read', csrf: false });
   if (!gate.ok) return gate.response;
 
   try {
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const gate = requireCmsKey(request);
+  const gate = await requireCmsAccess(request, { permission: 'content.write' });
   if (!gate.ok) return gate.response;
 
   let body: unknown;
@@ -71,6 +72,14 @@ export async function PUT(request: Request) {
         data: next as Prisma.InputJsonValue,
       },
       select: { id: true, schemaVersion: true, updatedAt: true },
+    });
+
+    await writeAuditStandalone(gate.actor, {
+      action: 'save_draft',
+      entity: 'ContentDocument',
+      entityId: draft.id,
+      detail: 'Saved draft (not published)',
+      metadata: { actor: actorLabel(gate.actor), schemaVersion: draft.schemaVersion },
     });
 
     return jsonOk({

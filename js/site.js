@@ -1,7 +1,8 @@
 /* ==========================================================================
    Elitex Interior — public site runtime
    --------------------------------------------------------------------------
-   Renders every page from content/content.json (the CMS database):
+   Renders every page from published Neon (GET /api/content) with
+   content/content.json as fallback if the API is unreachable:
      • hydrates text sections in place (no layout shift)
      • renders media collections with skeletons + IntersectionObserver lazy load
      • applies Cloudinary transformations (f_auto/q_auto → WebP/AVIF)
@@ -931,8 +932,28 @@
       else if (PAGE === 'reviews') initCosmicDecor();
     };
 
-    fetch('content/content.json', { cache: 'no-cache' })
-      .then(function (r) { return r.json(); })
+    var CONTENT_API = 'https://elitex-interior.vercel.app/api/content';
+
+    function loadPublished() {
+      return fetch(CONTENT_API, { cache: 'no-cache' }).then(function (r) {
+        if (!r.ok) throw new Error('content api ' + r.status);
+        return r.json();
+      }).then(function (json) {
+        if (json && json.content && json.content.site && json.content.pages) return json.content;
+        if (json && json.site && json.pages) return json;
+        throw new Error('content api shape');
+      });
+    }
+
+    function loadFallback() {
+      return fetch('content/content.json', { cache: 'no-cache' }).then(function (r) {
+        if (!r.ok) throw new Error('content.json ' + r.status);
+        return r.json();
+      });
+    }
+
+    loadPublished()
+      .catch(function () { return loadFallback(); })
       .then(function (json) {
         if (!content) content = json; /* preview draft wins */
         render();
@@ -940,7 +961,7 @@
         initTawk();
       })
       .catch(function (err) {
-        console.error('[ElitexCMS] failed to load content.json:', err);
+        console.error('[ElitexCMS] failed to load published content:', err);
         if (content) { render(); chrome(); } else { hidePreloader(); }
       });
 
