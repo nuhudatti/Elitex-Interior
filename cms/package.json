@@ -26,6 +26,7 @@
     "test:phase3b": "tsx scripts/verify-phase3b.ts",
     "test:phase3c": "tsx scripts/verify-phase3c.ts",
     "test:phase4": "tsx scripts/verify-phase4.ts",
+    "test:phase4:cutover": "tsx scripts/phase4-public-cutover.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

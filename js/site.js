@@ -215,7 +215,7 @@
   /* ------------------------------------------------------------------ */
 
   function whatsappUrl() {
-    var c = content.site.contact;
+    var c = (content.site && content.site.contact) || {};
     return 'https://wa.me/' + (c.whatsappNumber || '') + '?text=' + encodeURIComponent(c.whatsappMessage || '');
   }
 
@@ -875,6 +875,9 @@
   function render() {
     if (!content) return;
     try {
+      content.site = content.site || {};
+      content.site.contact = content.site.contact || {};
+      content.pages = content.pages || {};
       applySeo();
       if (PAGE === 'home') { renderHome(); }
       else if (PAGE === 'showcase' || PAGE === 'showcase2') { renderShowcase(); }
@@ -932,30 +935,69 @@
       else if (PAGE === 'reviews') initCosmicDecor();
     };
 
-    var CONTENT_API = 'https://elitex-interior.vercel.app/api/content';
+    /* Public site reads published Neon only. Draft is never requested here.
+       Preview (?cmsPreview=1) may overlay draft via postMessage from the CMS. */
+    var DEFAULT_CONTENT_API = 'https://elitex-interior.vercel.app/api/content';
+
+    function contentApiUrl() {
+      var meta = document.querySelector('meta[name="elitex-content-api"]');
+      if (meta && meta.getAttribute('content')) return meta.getAttribute('content');
+      try {
+        var stored = localStorage.getItem('elitex.cmsContentApi');
+        if (stored) return stored;
+      } catch (e) {}
+      return DEFAULT_CONTENT_API;
+    }
+
+    function looksLikeContent(doc) {
+      return !!(doc && typeof doc === 'object' && doc.site && typeof doc.site === 'object' && doc.pages && typeof doc.pages === 'object');
+    }
+
+    function fetchJson(url) {
+      var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 8000) : null;
+      return fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        credentials: 'omit',
+        headers: { Accept: 'application/json' },
+        signal: ctrl ? ctrl.signal : undefined
+      }).then(function (r) {
+        if (!r.ok) throw new Error('http ' + r.status);
+        return r.json();
+      }).finally(function () {
+        if (timer) clearTimeout(timer);
+      });
+    }
 
     function loadPublished() {
-      return fetch(CONTENT_API, { cache: 'no-cache' }).then(function (r) {
-        if (!r.ok) throw new Error('content api ' + r.status);
-        return r.json();
-      }).then(function (json) {
-        if (json && json.content && json.content.site && json.content.pages) return json.content;
-        if (json && json.site && json.pages) return json;
-        throw new Error('content api shape');
+      return fetchJson(contentApiUrl()).then(function (json) {
+        if (json && json.document && json.document !== 'published') {
+          throw new Error('not published');
+        }
+        var doc = json && json.content ? json.content : json;
+        if (!looksLikeContent(doc)) throw new Error('shape');
+        if (typeof console !== 'undefined' && console.info) {
+          console.info('[Elitex] content source: published');
+        }
+        return doc;
       });
     }
 
     function loadFallback() {
-      return fetch('content/content.json', { cache: 'no-cache' }).then(function (r) {
-        if (!r.ok) throw new Error('content.json ' + r.status);
-        return r.json();
+      return fetchJson('content/content.json').then(function (doc) {
+        if (!looksLikeContent(doc)) throw new Error('fallback shape');
+        if (typeof console !== 'undefined' && console.warn) {
+          console.warn('[Elitex] published content unavailable; using saved snapshot');
+        }
+        return doc;
       });
     }
 
     loadPublished()
       .catch(function () { return loadFallback(); })
       .then(function (json) {
-        if (!content) content = json; /* preview draft wins */
+        if (!content) content = json; /* preview draft overlay wins; public always uses fetched published/snapshot */
         render();
         chrome();
         initTawk();

@@ -4,11 +4,11 @@ import { jsonError, jsonOk, logSafe, publicCors, publicDbError } from '@/lib/api
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export function OPTIONS() {
-  return publicCors(jsonOk({ ok: true }));
+export function OPTIONS(request: Request) {
+  return publicCors(jsonOk({ ok: true }), request);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const rows = await prisma.media.findMany({
       orderBy: { createdAt: 'desc' },
@@ -54,10 +54,11 @@ export async function GET() {
           createdAt: row.createdAt.toISOString(),
           updatedAt: row.updatedAt.toISOString(),
         })),
-      })
+      }),
+      request
     );
   } catch (error) {
     logSafe('GET /api/media', error);
-    return publicCors(jsonError(500, publicDbError(error)));
+    return publicCors(jsonError(500, publicDbError(error)), request);
   }
 }

@@ -16,10 +16,36 @@ export function jsonError(status: number, error: string, extra?: Record<string, 
   );
 }
 
-export function publicCors(response: NextResponse) {
-  response.headers.set('Access-Control-Allow-Origin', '*');
+const PUBLIC_SITE_ORIGINS = new Set([
+  'https://elitexinterior.com',
+  'https://www.elitexinterior.com',
+]);
+
+function extraPublicSiteOrigins() {
+  const raw = process.env.CMS_PUBLIC_SITE_ORIGINS || '';
+  return raw
+    .split(',')
+    .map((item) => item.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+}
+
+export function isPublicSiteOrigin(origin: string) {
+  if (!origin) return false;
+  if (PUBLIC_SITE_ORIGINS.has(origin)) return true;
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  return extraPublicSiteOrigins().includes(origin);
+}
+
+/** CORS for public GET APIs only. Reflects allowed browser origins; never used for credentialed CMS routes. */
+export function publicCors(response: NextResponse, request?: Request) {
+  const origin = request?.headers.get('origin') || '';
+  if (origin && isPublicSiteOrigin(origin)) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Vary', 'Origin');
+  }
   response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+  response.headers.set('Access-Control-Max-Age', '86400');
   return response;
 }
 
