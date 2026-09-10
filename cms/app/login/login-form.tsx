@@ -64,7 +64,7 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <button className="btn btn-primary" type="submit" disabled={busy} style={{ width: '100%' }}>
+      <button className="btn btn-primary" type="submit" disabled={busy} style={{ width: '100%' }} aria-busy={busy}>
         {busy ? 'Signing in…' : 'Sign in'}
       </button>
     </form>

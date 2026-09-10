@@ -56,7 +56,7 @@ export async function DELETE(
       action: 'media_delete',
       entity: 'Media',
       entityId: id,
-      detail: liveRefs.length ? 'Deleted referenced media with force' : 'Deleted media',
+      detail: liveRefs.length ? 'Removed a file that was used on the live site' : 'Removed from the library',
       metadata: {
         actor: actorLabel(gate.actor),
         url: row.url,

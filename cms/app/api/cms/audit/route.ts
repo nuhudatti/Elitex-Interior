@@ -21,7 +21,6 @@ export async function GET(request: Request) {
         entity: true,
         entityId: true,
         detail: true,
-        metadata: true,
         createdAt: true,
         user: { select: { id: true, email: true, name: true, role: true } },
       },
@@ -30,8 +29,13 @@ export async function GET(request: Request) {
     return jsonOk({
       ok: true,
       entries: rows.map((row) => ({
-        ...row,
+        id: row.id,
+        action: row.action,
+        entity: row.entity,
+        entityId: row.entityId,
+        detail: row.detail,
         createdAt: row.createdAt.toISOString(),
+        user: row.user,
       })),
     });
   } catch (error) {

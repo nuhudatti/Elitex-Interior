@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ConfirmDialog } from '@/components/cms/ConfirmDialog';
 import { useDraft } from '@/components/cms/DraftProvider';
 import { formatWhen } from '@/lib/format';
-import Link from 'next/link';
+import { CmsLink } from '@/components/cms/UnsavedNav';
 
 export default function PublishPage() {
   const {
@@ -27,7 +27,7 @@ export default function PublishPage() {
     <>
       <div className="card">
         <p>
-          <b>Live content</b> last published {formatWhen(publishedUpdatedAt)}
+          <b>Live website</b> last published {formatWhen(publishedUpdatedAt)}
         </p>
         <p>
           <b>Draft</b> last saved {formatWhen(draftUpdatedAt)}
@@ -37,14 +37,14 @@ export default function PublishPage() {
             ? 'You still have unsaved edits. Save the draft first.'
             : unpublished
               ? `Ready to publish: ${changedSections.join(', ') || 'draft changes'}.`
-              : 'Nothing waiting. The live content already matches this draft.'}
+              : 'Nothing waiting. The live website already matches this draft.'}
         </p>
         {error ? <p className="err">{error}</p> : null}
         {message ? <p className="ok">{message}</p> : null}
         <div className="row" style={{ marginTop: 16 }}>
-          <Link className="btn" href="/preview">
+          <CmsLink className="btn" href="/preview">
             Preview draft
-          </Link>
+          </CmsLink>
           <button className="btn" type="button" disabled={!dirty || saving} onClick={() => saveDraft()}>
             {saving ? 'Saving…' : 'Save draft only'}
           </button>
@@ -59,8 +59,8 @@ export default function PublishPage() {
       </div>
       {confirm ? (
         <ConfirmDialog
-          title="Publish to the live content source?"
-          body="You are about to publish the current draft to the live content source in Neon. The public website files are not switched in this phase."
+          title="Publish these changes?"
+          body="The current draft will become the live website content. Visitors will see it the next time the site loads. A version snapshot is kept."
           confirmLabel="Publish changes"
           busy={publishing}
           onCancel={() => setConfirm(false)}

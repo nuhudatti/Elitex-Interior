@@ -14,6 +14,10 @@ export type EditorField = {
   kind?: 'image' | 'video' | 'audio';
   options?: Array<string | { value: string; label: string }>;
   hint?: string;
+  required?: boolean;
+  min?: number;
+  max?: number;
+  maxLength?: number;
 };
 
 function LocalMedia({
@@ -30,11 +34,11 @@ function LocalMedia({
   const [open, setOpen] = useState(false);
   return (
     <div className="field">
-      <label>{label}</label>
+      <span className="label-text">{label}</span>
       <div className="row">
         <MediaThumb url={value} type={kind} />
         <button className="btn btn-primary" type="button" onClick={() => setOpen(true)}>
-          Choose media
+          {value ? 'Replace media' : 'Choose media'}
         </button>
         {value ? (
           <button className="btn" type="button" onClick={() => onChange('')}>
@@ -42,10 +46,6 @@ function LocalMedia({
           </button>
         ) : null}
       </div>
-      <details>
-        <summary className="hint">File URL</summary>
-        <input className="input" value={value} onChange={(e) => onChange(e.target.value)} />
-      </details>
       {open ? (
         <MediaPicker
           kind={kind}
@@ -86,6 +86,7 @@ export function CollectionEditor({
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [q, setQ] = useState('');
   const [dragId, setDragId] = useState<string | null>(null);
+  const [formError, setFormError] = useState('');
   const list = (getPath(content, path) as CollectionItem[] | undefined) || [];
   const sorted = [...list].sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
   const visible = q
@@ -106,6 +107,15 @@ export function CollectionEditor({
   }
 
   function saveItem(item: CollectionItem) {
+    const missing = fields.find((field) => {
+      const required = field.required || field.key === 'title' || field.key === 'name';
+      if (!required) return false;
+      return !String(item[field.key] ?? '').trim();
+    });
+    if (missing) {
+      setFormError(`${missing.label} is required.`);
+      return;
+    }
     const next = list.some((row) => row.id === item.id)
       ? list.map((row) => (row.id === item.id ? item : row))
       : [
@@ -118,6 +128,7 @@ export function CollectionEditor({
           },
         ];
     write(next);
+    setFormError('');
     setEditing(null);
   }
 
@@ -137,10 +148,17 @@ export function CollectionEditor({
     const next = [...sorted];
     const from = next.findIndex((item) => item.id === fromId);
     const to = next.findIndex((item) => item.id === toId);
-    if (from < 0 || to < 0) return;
+    if (from < 0 || to < 0 || from === to) return;
     const [row] = next.splice(from, 1);
     next.splice(to, 0, row);
     write(next);
+  }
+
+  function nudge(id: string, dir: -1 | 1) {
+    const from = sorted.findIndex((item) => item.id === id);
+    const to = from + dir;
+    if (from < 0 || to < 0 || to >= sorted.length) return;
+    move(String(sorted[from].id), String(sorted[to].id));
   }
 
   const cover = (item: CollectionItem) =>
@@ -149,15 +167,26 @@ export function CollectionEditor({
   return (
     <div>
       {sorted.length > 8 ? (
-        <input className="input" placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBottom: 12 }} />
+        <div className="field">
+          <label htmlFor={`search-${prefix}`}>Search</label>
+          <input
+            id={`search-${prefix}`}
+            className="input"
+            placeholder="Search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            style={{ marginBottom: 12 }}
+          />
+        </div>
       ) : null}
+      {!sorted.length ? <p className="empty">{addLabel} to get started. Changes stay in the draft until you publish.</p> : null}
       <div className={variant === 'cards' ? 'cards-grid' : 'collection'}>
-        {visible.map((item) => (
+        {visible.map((item) => {
+          const index = sorted.findIndex((row) => row.id === item.id);
+          return (
           <div
-            className={variant === 'cards' ? 'visual-card' : 'item-row'}
+            className={variant === 'cards' ? 'visual-card' : 'item-row has-handle'}
             key={String(item.id)}
-            draggable
-            onDragStart={() => setDragId(String(item.id))}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => {
               if (dragId) move(dragId, String(item.id));
@@ -173,6 +202,27 @@ export function CollectionEditor({
                   <b>{titleOf(item) || 'Untitled'}</b>
                   <span>{subtitleOf?.(item) || ''}</span>
                   <div className="row" style={{ marginTop: 8 }}>
+                    <button
+                      className="drag-handle"
+                      type="button"
+                      draggable
+                      aria-label="Drag to reorder"
+                      onDragStart={() => setDragId(String(item.id))}
+                      onDragEnd={() => setDragId(null)}
+                    >
+                      ⋮⋮
+                    </button>
+                    <button className="btn btn-sm" type="button" disabled={index === 0} onClick={() => nudge(String(item.id), -1)}>
+                      Up
+                    </button>
+                    <button
+                      className="btn btn-sm"
+                      type="button"
+                      disabled={index === sorted.length - 1}
+                      onClick={() => nudge(String(item.id), 1)}
+                    >
+                      Down
+                    </button>
                     <span className={`chip ${item.status || 'published'}`}>{String(item.status || 'published')}</span>
                     <button className="btn btn-sm" type="button" onClick={() => setEditing({ ...item })}>
                       Edit
@@ -188,12 +238,33 @@ export function CollectionEditor({
               </>
             ) : (
               <>
+                <button
+                  className="drag-handle"
+                  type="button"
+                  draggable
+                  aria-label="Drag to reorder"
+                  onDragStart={() => setDragId(String(item.id))}
+                  onDragEnd={() => setDragId(null)}
+                >
+                  ⋮⋮
+                </button>
                 <MediaThumb url={cover(item)} />
                 <div>
                   <b>{titleOf(item) || 'Untitled'}</b>
                   <span>{subtitleOf?.(item) || ''}</span>
                 </div>
                 <div className="row">
+                  <button className="btn btn-sm" type="button" disabled={index === 0} onClick={() => nudge(String(item.id), -1)}>
+                    Up
+                  </button>
+                  <button
+                    className="btn btn-sm"
+                    type="button"
+                    disabled={index === sorted.length - 1}
+                    onClick={() => nudge(String(item.id), 1)}
+                  >
+                    Down
+                  </button>
                   <span className={`chip ${item.status || 'published'}`}>{String(item.status || 'published')}</span>
                   <button className="btn btn-sm" type="button" onClick={() => setEditing({ ...item })}>
                     Edit
@@ -221,27 +292,41 @@ export function CollectionEditor({
               </>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
       <button
         className="btn btn-primary"
         type="button"
         style={{ marginTop: 12 }}
-        onClick={() => setEditing({ ...(newItem?.() || {}), id: newId(prefix), status: 'published' })}
+        onClick={() => {
+          setFormError('');
+          setEditing({ ...(newItem?.() || {}), id: newId(prefix), status: 'published' });
+        }}
       >
         {addLabel}
       </button>
       {editing ? (
         <div className="modal-backdrop" onClick={() => setEditing(null)}>
-          <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-            <h3>{list.some((row) => row.id === editing.id) ? 'Edit' : 'New'}</h3>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`${prefix}-edit-title`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id={`${prefix}-edit-title`}>{list.some((row) => row.id === editing.id) ? 'Edit' : 'New'}</h3>
+            {formError ? <p className="err">{formError}</p> : null}
             {fields.map((field) => {
+              const id = `${prefix}-${editing.id}-${field.key}`;
               if (field.type === 'media') {
+                const mediaKind =
+                  field.kind || (String(editing.mediaType || '') === 'video' ? 'video' : String(editing.mediaType || '') === 'image' ? 'image' : field.kind);
                 return (
                   <LocalMedia
                     key={field.key}
                     label={field.label}
-                    kind={field.kind}
+                    kind={mediaKind}
                     value={String(editing[field.key] ?? '')}
                     onChange={(url) => setEditing({ ...editing, [field.key]: url })}
                   />
@@ -250,8 +335,9 @@ export function CollectionEditor({
               if (field.type === 'select') {
                 return (
                   <div className="field" key={field.key}>
-                    <label>{field.label}</label>
+                    <label htmlFor={id}>{field.label}</label>
                     <select
+                      id={id}
                       className="select"
                       value={String(editing[field.key] ?? '')}
                       onChange={(e) => setEditing({ ...editing, [field.key]: e.target.value })}
@@ -273,20 +359,25 @@ export function CollectionEditor({
                 return (
                   <div className="field" key={field.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <input
+                      id={id}
                       type="checkbox"
                       checked={Boolean(editing[field.key])}
                       onChange={(e) => setEditing({ ...editing, [field.key]: e.target.checked })}
                     />
-                    <label style={{ margin: 0 }}>{field.label}</label>
+                    <label htmlFor={id} style={{ margin: 0 }}>
+                      {field.label}
+                    </label>
                   </div>
                 );
               }
               if (field.type === 'textarea') {
                 return (
                   <div className="field" key={field.key}>
-                    <label>{field.label}</label>
+                    <label htmlFor={id}>{field.label}</label>
                     <textarea
+                      id={id}
                       className="textarea"
+                      maxLength={field.maxLength || 4000}
                       value={String(editing[field.key] ?? '')}
                       onChange={(e) => setEditing({ ...editing, [field.key]: e.target.value })}
                     />
@@ -295,10 +386,14 @@ export function CollectionEditor({
               }
               return (
                 <div className="field" key={field.key}>
-                  <label>{field.label}</label>
+                  <label htmlFor={id}>{field.label}</label>
                   <input
+                    id={id}
                     className="input"
                     type={field.type === 'number' ? 'number' : 'text'}
+                    min={field.min}
+                    max={field.max}
+                    maxLength={field.type === 'number' ? undefined : field.maxLength || 180}
                     value={String(editing[field.key] ?? '')}
                     onChange={(e) =>
                       setEditing({

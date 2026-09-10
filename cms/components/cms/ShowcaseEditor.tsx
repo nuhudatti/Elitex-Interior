@@ -11,7 +11,7 @@ export function ShowcaseEditor({ pageKey, fileName }: { pageKey: 'showcase' | 's
   return (
     <>
       <p className="hint" style={{ marginTop: -8, marginBottom: 16 }}>
-        {fileName} — visual gallery, then project stories in Projects.
+        {fileName === 'project2.html' ? 'Showcase 2 gallery.' : 'Showcase gallery.'} Project stories are edited under Projects.
       </p>
       <div className="card">
         <Field label="Hero title" path={`pages.${pageKey}.hero.title`} hint="Use <br> for a line break" />

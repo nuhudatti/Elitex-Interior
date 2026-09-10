@@ -65,6 +65,7 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
       setContent(draft.json.content);
       setDraftUpdatedAt(draft.json.updatedAt || null);
       setDirty(false);
+      setError('');
     } else {
       setError(draft.json.error || 'The draft could not be loaded. Check your connection and try again.');
     }
@@ -96,12 +97,14 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
     setContent((current) => (current ? setPath(current, path, value) : current));
     setDirty(true);
     setMessage('');
+    setError('');
   }, []);
 
   const replaceContent = useCallback((next: ContentDocumentData) => {
     setContent(next);
     setDirty(true);
     setMessage('');
+    setError('');
   }, []);
 
   const saveDraft = useCallback(async () => {
@@ -120,8 +123,9 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
       setDirty(false);
+      setError('');
       setDraftUpdatedAt(typeof result.json.updatedAt === 'string' ? result.json.updatedAt : null);
-      setMessage('Saved just now');
+      setMessage(`Saved ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
       push('Draft saved');
       return true;
     } finally {
@@ -153,7 +157,7 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
         const text =
           result.response.status === 403
             ? "You don't have permission to publish changes."
-            : friendlyError(result.json.error, result.json.error || 'Changes could not be published.');
+            : friendlyError(result.json.error, 'Changes could not be published.');
         setError(text);
         push(text, 'error');
         return false;

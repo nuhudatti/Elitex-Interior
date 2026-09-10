@@ -16,28 +16,40 @@ export default function SettingsPage() {
   const { push } = useToast();
   const [settings, setSettings] = useState<Settings>({});
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     cmsJson<{ settings?: Settings }>('/api/cms/settings')
       .then((result) => {
         if (result.ok) setSettings(result.json.settings || {});
         else setError(result.json.error || "You don't have permission to change settings.");
+        setLoading(false);
       })
-      .catch(() => setError('Settings could not be loaded.'));
+      .catch(() => {
+        setError('Settings could not be loaded.');
+        setLoading(false);
+      });
   }, []);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    setSaving(true);
+    setError('');
     const result = await cmsJson('/api/cms/settings', {
       method: 'PUT',
       body: JSON.stringify(settings),
     });
+    setSaving(false);
     if (!result.ok) {
       setError(result.json.error || 'Settings could not be saved.');
+      push(result.json.error || 'Settings could not be saved.', 'error');
       return;
     }
     push('Settings saved');
   }
+
+  if (loading) return <div className="skeleton" style={{ height: 220 }} />;
 
   return (
     <>
@@ -99,8 +111,8 @@ export default function SettingsPage() {
             onChange={(e) => setSettings({ ...settings, cldPreset: e.target.value })}
           />
         </div>
-        <button className="btn btn-primary" type="submit">
-          Save settings
+        <button className="btn btn-primary" type="submit" disabled={saving}>
+          {saving ? 'Saving…' : 'Save settings'}
         </button>
       </form>
     </>

@@ -36,7 +36,10 @@ export async function GET(
         label: row.label,
         createdAt: row.createdAt.toISOString(),
         createdBy: row.createdBy,
-        content: parsed.data,
+        summary: {
+          siteName: (parsed.data.site as { name?: string } | undefined)?.name || 'Elitex Interior',
+          pages: Object.keys(parsed.data.pages || {}),
+        },
       },
     });
   } catch (error) {

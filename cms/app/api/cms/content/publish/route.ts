@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         action: 'publish',
         entity: 'ContentDocument',
         entityId: published.id,
-        detail: 'Published draft to published ContentDocument',
+        detail: 'Published the current draft',
         metadata: {
           actor,
           versionId: version.id,

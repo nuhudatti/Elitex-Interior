@@ -1,5 +1,7 @@
 'use client';
 
+import { useModalA11y } from './useModalA11y';
+
 export function ConfirmDialog({
   title,
   body,
@@ -17,9 +19,11 @@ export function ConfirmDialog({
   onCancel: () => void;
   onConfirm: () => void;
 }) {
+  const ref = useModalA11y(onCancel);
   return (
     <div className="modal-backdrop" onClick={onCancel} role="presentation">
       <div
+        ref={ref}
         className="modal"
         role="dialog"
         aria-modal="true"

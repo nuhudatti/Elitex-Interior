@@ -78,7 +78,7 @@ export async function PUT(request: Request) {
       action: 'save_draft',
       entity: 'ContentDocument',
       entityId: draft.id,
-      detail: 'Saved draft (not published)',
+      detail: 'Saved the draft. Live content was not changed.',
       metadata: { actor: actorLabel(gate.actor), schemaVersion: draft.schemaVersion },
     });
 

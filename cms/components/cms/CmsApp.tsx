@@ -3,6 +3,7 @@
 import { DraftProvider } from './DraftProvider';
 import { Shell } from './Shell';
 import { ToastProvider } from './Toast';
+import { UnsavedNavProvider } from './UnsavedNav';
 
 export function CmsApp({
   children,
@@ -20,9 +21,11 @@ export function CmsApp({
   return (
     <ToastProvider>
       <DraftProvider>
-        <Shell userName={userName} roleLabel={roleLabel} canPublish={canPublish} isAdmin={isAdmin}>
-          {children}
-        </Shell>
+        <UnsavedNavProvider>
+          <Shell userName={userName} roleLabel={roleLabel} canPublish={canPublish} isAdmin={isAdmin}>
+            {children}
+          </Shell>
+        </UnsavedNavProvider>
       </DraftProvider>
     </ToastProvider>
   );

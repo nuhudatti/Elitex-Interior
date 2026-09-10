@@ -23,7 +23,8 @@ export async function POST(request: Request) {
 
   const input = body && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {};
   const publicId = String(input.public_id || input.publicId || '').trim();
-  const resourceType = String(input.resource_type || input.resourceType || 'image');
+  const resourceTypeRaw = String(input.resource_type || input.resourceType || 'image');
+  const resourceType = resourceTypeRaw === 'video' ? 'video' : 'image';
   const cloudName = String(input.cloudName || process.env.CLOUDINARY_CLOUD_NAME || 'dpdmb5t1l');
   const format = input.format ? String(input.format) : null;
   const url = String(input.secure_url || input.secureUrl || input.url || '').trim();
@@ -34,34 +35,46 @@ export async function POST(request: Request) {
   }
 
   try {
-    const row = await prisma.media.upsert({
-      where: { url: finalUrl },
-      create: {
-        legacyId: newId('m'),
-        publicId,
-        cloudName,
-        resourceType,
-        url: finalUrl,
-        secureUrl: finalUrl,
-        format,
-        width: Number(input.width) || null,
-        height: Number(input.height) || null,
-        bytes: Number(input.bytes) || null,
-        folder: input.folder ? String(input.folder) : null,
-        originalFilename: input.original_filename ? String(input.original_filename) : String(input.name || '') || null,
-        source: 'cloudinary',
-      },
-      update: {
-        publicId,
-        secureUrl: finalUrl,
-        format,
-        width: Number(input.width) || null,
-        height: Number(input.height) || null,
-        bytes: Number(input.bytes) || null,
-        folder: input.folder ? String(input.folder) : null,
-        originalFilename: input.original_filename ? String(input.original_filename) : undefined,
-      },
-    });
+    const existing =
+      (await prisma.media.findUnique({ where: { url: finalUrl } })) ||
+      (publicId ? await prisma.media.findFirst({ where: { publicId, cloudName } }) : null);
+
+    const payload = {
+      publicId,
+      cloudName,
+      resourceType,
+      url: finalUrl,
+      secureUrl: finalUrl,
+      format,
+      width: Number(input.width) || null,
+      height: Number(input.height) || null,
+      bytes: Number(input.bytes) || null,
+      folder: input.folder ? String(input.folder) : null,
+      originalFilename: input.original_filename ? String(input.original_filename) : String(input.name || '') || null,
+      source: 'cloudinary',
+    };
+
+    const row = existing
+      ? await prisma.media.update({
+          where: { id: existing.id },
+          data: {
+            publicId,
+            secureUrl: finalUrl,
+            format,
+            width: payload.width,
+            height: payload.height,
+            bytes: payload.bytes,
+            folder: payload.folder,
+            originalFilename: payload.originalFilename || undefined,
+            resourceType,
+          },
+        })
+      : await prisma.media.create({
+          data: {
+            legacyId: newId('m'),
+            ...payload,
+          },
+        });
 
     const draft = await prisma.contentDocument.findUnique({ where: { key: 'draft' } });
     if (draft) {
@@ -91,13 +104,14 @@ export async function POST(request: Request) {
       action: 'media_complete',
       entity: 'Media',
       entityId: row.id,
-      detail: 'Recorded Cloudinary asset in Neon',
+      detail: 'Added to the media library',
       metadata: { actor: actorLabel(gate.actor), publicId, url: finalUrl },
     });
 
     return jsonOk({
       ok: true,
       saved: true,
+      created: !existing,
       published: false,
       media: {
         id: row.id,

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDraft } from '@/components/cms/DraftProvider';
 import { SaveBar } from '@/components/cms/fields';
+import { cmsJson } from '@/components/cms/api';
 
 const PAGES = [
   { file: 'index.html', label: 'Home' },
@@ -15,6 +16,27 @@ export default function PreviewPage() {
   const { content, loading } = useDraft();
   const [page, setPage] = useState('index.html');
   const frame = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search).get('page');
+    if (query && PAGES.some((item) => item.file === query)) {
+      setPage(query);
+      return;
+    }
+    const stored = window.localStorage.getItem('elitex_cms_preview_page');
+    if (stored && PAGES.some((item) => item.file === stored)) {
+      setPage(stored);
+    }
+    cmsJson<{ settings?: { previewPage?: string } }>('/api/cms/settings').then((result) => {
+      if (!result.ok || query) return;
+      const next = result.json.settings?.previewPage;
+      if (next && PAGES.some((item) => item.file === next) && !stored) setPage(next);
+    });
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('elitex_cms_preview_page', page);
+  }, [page]);
 
   useEffect(() => {
     const iframe = frame.current;
@@ -36,7 +58,16 @@ export default function PreviewPage() {
   return (
     <>
       <div className="row" style={{ marginBottom: 12 }}>
-        <select className="select" value={page} onChange={(e) => setPage(e.target.value)} style={{ maxWidth: 240 }}>
+        <label htmlFor="preview-page-select" className="sr-only">
+          Preview page
+        </label>
+        <select
+          id="preview-page-select"
+          className="select"
+          value={page}
+          onChange={(e) => setPage(e.target.value)}
+          style={{ maxWidth: 240 }}
+        >
           {PAGES.map((item) => (
             <option key={item.file} value={item.file}>
               {item.label}

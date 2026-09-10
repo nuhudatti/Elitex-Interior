@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cmsJson } from './api';
 import { uploadToCloudinary, type SignedParams, type UploadConfig } from './uploader';
+import { formatBytes } from '@/lib/format';
 
 export type QueueItem = {
   id: string;
@@ -10,10 +11,30 @@ export type QueueItem = {
   status: 'waiting' | 'uploading' | 'processing' | 'done' | 'error' | 'canceled';
   progress: number;
   error?: string;
+  thumb?: string;
 };
 
 function newId() {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function fileKey(file: File) {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function isAllowed(file: File) {
+  const type = (file.type || '').toLowerCase();
+  const name = file.name.toLowerCase();
+  if (type.startsWith('image/') || type.startsWith('video/') || type.startsWith('audio/')) return true;
+  return /\.(jpe?g|png|gif|webp|avif|svg|bmp|tiff?|mp4|mov|m4v|webm|avi|mkv|qt|mp3|wav|ogg|m4a)$/i.test(name);
+}
+
+function fileKind(file: File) {
+  const type = (file.type || '').toLowerCase();
+  const name = file.name.toLowerCase();
+  if (type.startsWith('video') || /\.(mov|mp4|m4v|webm|avi|mkv)$/.test(name)) return 'Video';
+  if (type.startsWith('audio') || /\.(mp3|wav|ogg|m4a)$/.test(name)) return 'Audio';
+  return 'Image';
 }
 
 export function UploadQueue({
@@ -37,12 +58,23 @@ export function UploadQueue({
     });
   }, []);
 
-  const overall = useMemo(() => {
-    if (!items.length) return 0;
-    return items.reduce((sum, item) => sum + item.progress, 0) / items.length;
+  useEffect(() => {
+    return () => {
+      itemsRef.current.forEach((item) => {
+        if (item.thumb) URL.revokeObjectURL(item.thumb);
+      });
+    };
+  }, []);
+
+  const stats = useMemo(() => {
+    const total = items.length;
+    const completed = items.filter((item) => item.status === 'done').length;
+    const uploading = items.filter((item) => item.status === 'uploading' || item.status === 'processing').length;
+    const failed = items.filter((item) => item.status === 'error').length;
+    const remaining = items.filter((item) => item.status === 'waiting').length;
+    const overall = total ? items.reduce((sum, item) => sum + item.progress, 0) / total : 0;
+    return { total, completed, uploading, failed, remaining, overall };
   }, [items]);
-  const active = items.filter((item) => item.status === 'uploading' || item.status === 'processing' || item.status === 'waiting');
-  const failed = items.filter((item) => item.status === 'error');
 
   function patch(id: string, next: Partial<QueueItem>) {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...next } : item)));
@@ -50,13 +82,26 @@ export function UploadQueue({
 
   function addFiles(list: FileList | File[] | null) {
     if (!list?.length) return;
-    const next = Array.from(list).map((file) => ({
-      id: newId(),
-      file,
-      status: 'waiting' as const,
-      progress: 0,
-    }));
-    setItems((current) => [...current, ...next]);
+    const activeKeys = new Set(
+      itemsRef.current
+        .filter((item) => item.status === 'waiting' || item.status === 'uploading' || item.status === 'processing' || item.status === 'done')
+        .map((item) => fileKey(item.file))
+    );
+    const next: QueueItem[] = [];
+    for (const file of Array.from(list)) {
+      if (!isAllowed(file)) continue;
+      const key = fileKey(file);
+      if (activeKeys.has(key)) continue;
+      activeKeys.add(key);
+      next.push({
+        id: newId(),
+        file,
+        status: 'waiting',
+        progress: 0,
+        thumb: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      });
+    }
+    if (next.length) setItems((current) => [...current, ...next]);
   }
 
   async function drain() {
@@ -68,7 +113,7 @@ export function UploadQueue({
         if (!next) break;
         await uploadOne(next);
       }
-      onComplete?.();
+      if (itemsRef.current.some((item) => item.status === 'done')) onComplete?.();
     } finally {
       pumping.current = false;
       if (itemsRef.current.some((item) => item.status === 'waiting')) void drain();
@@ -84,7 +129,7 @@ export function UploadQueue({
     if (config.mode === 'unavailable') {
       patch(item.id, {
         status: 'error',
-        error: `Upload is not configured. Missing: ${config.missing.join(', ')}`,
+        error: 'Uploads are paused until Cloudinary is configured on the server.',
       });
       return;
     }
@@ -101,9 +146,15 @@ export function UploadQueue({
         if (!sign.ok) throw new Error(sign.json.error || 'Could not start upload');
         signed = sign.json;
       }
-      const asset = await uploadToCloudinary(item.file, config, signed, (ratio) => {
-        patch(item.id, { progress: ratio, status: ratio >= 1 ? 'processing' : 'uploading' });
-      }, controller.signal);
+      const asset = await uploadToCloudinary(
+        item.file,
+        config,
+        signed,
+        (ratio) => {
+          patch(item.id, { progress: ratio, status: ratio >= 1 ? 'processing' : 'uploading' });
+        },
+        controller.signal
+      );
       if (!asset.secure_url || !asset.public_id) throw new Error('Upload failed. Retry this file.');
       patch(item.id, { status: 'processing', progress: 1 });
       const complete = await cmsJson('/api/cms/media/complete', {
@@ -130,17 +181,27 @@ export function UploadQueue({
     patch(item.id, { status: 'waiting', progress: 0, error: undefined });
   }
 
+  function clearFinished() {
+    setItems((current) => {
+      current
+        .filter((item) => item.status === 'done' || item.status === 'canceled')
+        .forEach((item) => {
+          if (item.thumb) URL.revokeObjectURL(item.thumb);
+        });
+      return current.filter((item) => item.status !== 'done' && item.status !== 'canceled');
+    });
+  }
+
   const inputId = compact ? 'picker-files' : 'library-files';
+  const failed = items.filter((item) => item.status === 'error');
 
   return (
     <div>
       {config?.mode === 'unavailable' ? (
-        <div className="banner">
-          Uploads are paused until Cloudinary is configured on the server. Missing: {(config.missing || []).join(', ')}.
-        </div>
+        <div className="banner">Uploads are paused until Cloudinary is configured on the server.</div>
       ) : (
         <label
-          className={`dropzone ${hot ? 'hot' : ''}`}
+          className={`dropzone ${hot ? 'hot' : ''} ${compact ? 'compact' : ''}`}
           onDragOver={(e) => {
             e.preventDefault();
             setHot(true);
@@ -153,7 +214,7 @@ export function UploadQueue({
           }}
         >
           <strong>Drag photos and videos here</strong>
-          <p className="hint">or choose many files at once. Large videos upload in the background.</p>
+          <p className="hint">or choose many files at once. Large videos keep uploading in the background.</p>
           <span className="btn btn-primary" style={{ marginTop: 12 }}>
             Choose files
           </span>
@@ -174,7 +235,8 @@ export function UploadQueue({
         <div className="queue">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <span>
-              {active.length ? `Uploading ${items.filter((i) => i.status === 'done').length} of ${items.length}` : `${items.length} files`}
+              {stats.total} files · {stats.completed} ready · {stats.uploading} uploading · {stats.remaining} waiting
+              {stats.failed ? ` · ${stats.failed} failed` : ''}
             </span>
             <div className="row">
               {failed.length ? (
@@ -182,23 +244,26 @@ export function UploadQueue({
                   Retry failed
                 </button>
               ) : null}
-              <button
-                className="btn btn-sm"
-                type="button"
-                onClick={() => setItems((current) => current.filter((item) => item.status !== 'done' && item.status !== 'canceled'))}
-              >
+              <button className="btn btn-sm" type="button" onClick={clearFinished}>
                 Clear finished
               </button>
             </div>
           </div>
-          <div className="progress" aria-hidden>
-            <span style={{ width: `${Math.round(overall * 100)}%` }} />
+          <div className="progress" aria-label="Overall upload progress">
+            <span style={{ width: `${Math.round(stats.overall * 100)}%` }} />
           </div>
           {items.map((item) => (
             <div className="queue-item" key={item.id}>
+              {item.thumb ? (
+                <img className="queue-thumb" alt="" src={item.thumb} />
+              ) : (
+                <div className="queue-thumb kind">{fileKind(item.file)}</div>
+              )}
               <div>
                 <b>{item.file.name}</b>
                 <div className="hint">
+                  {fileKind(item.file)} · {formatBytes(item.file.size)}
+                  {' · '}
                   {item.status === 'waiting' && 'Waiting'}
                   {item.status === 'uploading' && `Uploading ${Math.round(item.progress * 100)}%`}
                   {item.status === 'processing' && 'Processing…'}

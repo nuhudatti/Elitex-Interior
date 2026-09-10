@@ -40,7 +40,7 @@ export async function POST(
       action: 'restore_version',
       entity: 'ContentVersion',
       entityId: version.id,
-      detail: 'Restored version into draft (published unchanged)',
+      detail: 'Restored a version into the draft. Live content was not changed.',
       metadata: {
         actor: actorLabel(gate.actor),
         versionId: version.id,

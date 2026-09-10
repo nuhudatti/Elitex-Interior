@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useDraft } from '@/components/cms/DraftProvider';
 import { formatWhen } from '@/lib/format';
+import { auditActionLabel } from '@/lib/audit-labels';
+import { CmsLink } from '@/components/cms/UnsavedNav';
 
 export function DashboardClient({
   mediaCount,
@@ -31,21 +32,21 @@ export function DashboardClient({
           <strong>Draft changes.</strong> {waiting} section{waiting === 1 ? '' : 's'} waiting to be published
           {changedSections.length ? `: ${changedSections.join(', ')}` : ''}.
           <div className="row" style={{ marginTop: 10 }}>
-            <Link className="btn" href="/content">
+            <CmsLink className="btn" href="/content">
               Review changes
-            </Link>
-            <Link className="btn" href="/preview">
+            </CmsLink>
+            <CmsLink className="btn" href="/preview">
               Preview
-            </Link>
+            </CmsLink>
             {user?.canPublish ? (
-              <Link className="btn btn-primary" href="/publish">
+              <CmsLink className="btn btn-primary" href="/publish">
                 Publish
-              </Link>
+              </CmsLink>
             ) : null}
           </div>
         </div>
       ) : (
-        <div className="banner ok">The saved draft matches the live content source.</div>
+        <div className="banner ok">The saved draft matches the live website content.</div>
       )}
 
       <div className="grid cols-4">
@@ -76,25 +77,25 @@ export function DashboardClient({
         <div className="card">
           <h3>Quick actions</h3>
           <div className="row" style={{ marginTop: 10 }}>
-            <Link className="btn" href="/content/home">
+            <CmsLink className="btn" href="/content/home">
               Edit Home
-            </Link>
-            <Link className="btn" href="/content/projects">
-              Add Project
-            </Link>
-            <Link className="btn" href="/content/reviews">
-              Add Review
-            </Link>
-            <Link className="btn" href="/media">
-              Upload Media
-            </Link>
-            <Link className="btn" href="/preview">
-              Preview Draft
-            </Link>
+            </CmsLink>
+            <CmsLink className="btn" href="/content/projects">
+              Add project
+            </CmsLink>
+            <CmsLink className="btn" href="/content/reviews">
+              Add review
+            </CmsLink>
+            <CmsLink className="btn" href="/media">
+              Upload media
+            </CmsLink>
+            <CmsLink className="btn" href="/preview">
+              Preview
+            </CmsLink>
             {user?.canPublish ? (
-              <Link className="btn btn-primary" href="/publish">
+              <CmsLink className="btn btn-primary" href="/publish">
                 Publish
-              </Link>
+              </CmsLink>
             ) : null}
           </div>
         </div>
@@ -110,7 +111,7 @@ export function DashboardClient({
                   <tr key={row.id}>
                     <td>{formatWhen(row.createdAt)}</td>
                     <td>{row.who}</td>
-                    <td>{row.action}</td>
+                    <td>{auditActionLabel(row.action)}</td>
                     <td>{row.detail}</td>
                   </tr>
                 ))}

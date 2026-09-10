@@ -9,12 +9,16 @@ const ToastContext = createContext<{ push: (text: string, kind?: 'ok' | 'error')
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
 
+  const dismiss = useCallback((id: number) => {
+    setItems((current) => current.filter((item) => item.id !== id));
+  }, []);
+
   const push = useCallback((text: string, kind: 'ok' | 'error' = 'ok') => {
     const id = Date.now() + Math.random();
     setItems((current) => [...current.slice(-3), { id, text, kind }]);
     window.setTimeout(() => {
       setItems((current) => current.filter((item) => item.id !== id));
-    }, 3600);
+    }, kind === 'error' ? 7000 : 3600);
   }, []);
 
   const value = useMemo(() => ({ push }), [push]);
@@ -22,10 +26,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="toasts" aria-live="polite">
+      <div className="toasts">
         {items.map((item) => (
-          <div key={item.id} className={`toast ${item.kind === 'error' ? 'error' : ''}`} role="status">
-            {item.text}
+          <div
+            key={item.id}
+            className={`toast ${item.kind === 'error' ? 'error' : ''}`}
+            role={item.kind === 'error' ? 'alert' : 'status'}
+            aria-live={item.kind === 'error' ? 'assertive' : 'polite'}
+          >
+            <span>{item.text}</span>
+            <button className="toast-dismiss" type="button" aria-label="Dismiss" onClick={() => dismiss(item.id)}>
+              ×
+            </button>
           </div>
         ))}
       </div>

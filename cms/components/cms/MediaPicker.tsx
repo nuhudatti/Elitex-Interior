@@ -1,26 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { cmsJson } from './api';
+import { useState } from 'react';
 import { MediaThumb } from './MediaThumb';
 import { UploadQueue } from './UploadQueue';
 import { isAudioUrl, isVideoUrl } from '@/lib/cloudinary-url';
+import { useMediaLibrary, type MediaRow } from './useMediaLibrary';
+import { useModalA11y } from './useModalA11y';
 
-export type MediaRow = {
-  id: string;
-  url: string;
-  secureUrl?: string | null;
-  publicId?: string | null;
-  originalFilename?: string | null;
-  resourceType: string;
-  folder?: string | null;
-  format?: string | null;
-  width?: number | null;
-  height?: number | null;
-  bytes?: number | null;
-  createdAt?: string;
-  updatedAt?: string;
-};
+export type { MediaRow };
 
 export { MediaThumb };
 
@@ -44,38 +31,9 @@ export function MediaPicker({
   onPick: (url: string, row: MediaRow) => void;
   onPickMany?: (rows: MediaRow[]) => void;
 }) {
-  const [rows, setRows] = useState<MediaRow[]>([]);
-  const [q, setQ] = useState('');
+  const ref = useModalA11y(onClose);
+  const library = useMediaLibrary({ kind, pageSize: 48 });
   const [selected, setSelected] = useState<MediaRow[]>([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  async function load() {
-    const result = await cmsJson<{ media?: MediaRow[] }>('/api/cms/media');
-    if (result.ok) setRows(result.json.media || []);
-    else setError(result.json.error || 'The media library could not be loaded.');
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    load().catch(() => {
-      setError('The media library could not be loaded.');
-      setLoading(false);
-    });
-  }, []);
-
-  const filtered = useMemo(
-    () =>
-      rows.filter((row) => {
-        const type = kindOf(row);
-        if (kind && type !== kind) return false;
-        if (q && !`${row.originalFilename || ''} ${row.publicId || ''} ${row.url}`.toLowerCase().includes(q.toLowerCase())) {
-          return false;
-        }
-        return true;
-      }),
-    [kind, q, rows]
-  );
 
   function toggle(row: MediaRow) {
     if (!multi) {
@@ -93,35 +51,65 @@ export function MediaPicker({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal wide" role="dialog" aria-modal="true" aria-labelledby="picker-title" onClick={(e) => e.stopPropagation()}>
+      <div ref={ref} className="modal wide" role="dialog" aria-modal="true" aria-labelledby="picker-title" onClick={(e) => e.stopPropagation()}>
         <h2 id="picker-title">Choose media</h2>
-        <UploadQueue compact onComplete={() => load()} />
-        <input className="input" placeholder="Search filename or public ID" value={q} onChange={(e) => setQ(e.target.value)} />
-        {error ? <p className="err">{error}</p> : null}
-        {loading ? <div className="skeleton" style={{ height: 120, marginTop: 12 }} /> : null}
-        <div className="media-grid" style={{ marginTop: 12 }}>
-          {filtered.map((row) => {
-            const url = row.secureUrl || row.url;
-            const type = kindOf(row);
-            const isOn = selected.some((item) => item.id === row.id);
-            return (
-              <button
-                type="button"
-                key={row.id}
-                className={`media-card ${isOn ? 'selected' : ''}`}
-                onClick={() => toggle(row)}
-                onDoubleClick={() => onPick(url, row)}
-              >
-                <MediaThumb url={url} type={type} large />
-                <div className="meta">
-                  {row.originalFilename || row.publicId || row.id}
-                  <br />
-                  {type}
-                </div>
-              </button>
-            );
-          })}
+        <UploadQueue compact onComplete={() => library.reload()} />
+        <div className="row" style={{ marginBottom: 12 }}>
+          <input
+            className="input"
+            placeholder="Search by name"
+            value={library.q}
+            onChange={(e) => library.setQ(e.target.value)}
+            aria-label="Search media"
+            style={{ flex: 1 }}
+          />
+          {library.kindLocked ? null : (
+            <select className="select" value={library.type} onChange={(e) => library.setType(e.target.value)} aria-label="Filter type" style={{ maxWidth: 140 }}>
+              <option value="">All</option>
+              <option value="image">Images</option>
+              <option value="video">Videos</option>
+            </select>
+          )}
         </div>
+        {library.error ? <p className="err">{library.error}</p> : null}
+        {library.loading ? (
+          <div className="media-grid" style={{ marginTop: 12 }}>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="skeleton" style={{ height: 148 }} />
+            ))}
+          </div>
+        ) : library.rows.length ? (
+          <div className="media-grid" style={{ marginTop: 12 }}>
+            {library.rows.map((row) => {
+              const url = row.secureUrl || row.url;
+              const type = kindOf(row);
+              const isOn = selected.some((item) => item.id === row.id);
+              return (
+                <button
+                  type="button"
+                  key={row.id}
+                  className={`media-card ${isOn ? 'selected' : ''}`}
+                  onClick={() => toggle(row)}
+                  onDoubleClick={() => onPick(url, row)}
+                >
+                  <MediaThumb url={url} type={type} large />
+                  <div className="meta">
+                    {row.originalFilename || row.publicId || row.id}
+                    <br />
+                    {type}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="empty">No matching files. Upload above or try another search.</p>
+        )}
+        {library.hasMore ? (
+          <button className="btn" type="button" style={{ marginTop: 12 }} disabled={library.loadingMore} onClick={library.loadMore}>
+            {library.loadingMore ? 'Loading…' : 'Load more'}
+          </button>
+        ) : null}
         <div className="row" style={{ marginTop: 14, justifyContent: 'flex-end' }}>
           <button className="btn" type="button" onClick={onClose}>
             Cancel

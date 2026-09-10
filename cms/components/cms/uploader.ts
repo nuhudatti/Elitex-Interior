@@ -35,9 +35,9 @@ function parseCldError(xhr: XMLHttpRequest) {
     msg = '';
   }
   if (!msg && xhr.status) msg = `Upload failed (${xhr.status})`;
-  if (/preset/i.test(msg)) return 'Upload preset not found.';
+  if (/preset/i.test(msg)) return 'Upload preset not found. Retry this file or ask an administrator.';
   if (!msg || xhr.status === 0) return 'Network error during upload. Keep this tab open and retry.';
-  return msg;
+  return 'Upload failed. Retry this file.';
 }
 
 function postChunk(

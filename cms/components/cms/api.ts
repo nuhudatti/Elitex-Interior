@@ -41,7 +41,7 @@ export async function cmsJson<T extends ApiJson = ApiJson>(path: string, init: R
       response,
       json: {
         ...json,
-        error: json.error ? friendlyError(json.error, json.error) : json.error,
+        error: json.error ? friendlyError(json.error) : json.error,
       },
       ok: response.ok && json.ok !== false,
     };
