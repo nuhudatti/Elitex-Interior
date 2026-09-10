@@ -16,6 +16,9 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:import": "tsx scripts/import-content.ts",
     "db:health": "tsx scripts/check-db.ts",
+    "import:content": "tsx scripts/import-content.ts",
+    "check:db": "tsx scripts/check-db.ts",
+    "phase1:init": "prisma migrate deploy && npm run import:content",
     "postinstall": "prisma generate"
   },
   "dependencies": {
