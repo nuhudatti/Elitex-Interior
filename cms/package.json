@@ -1,0 +1,35 @@
+{
+  "name": "elitex-cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 1 CMS API for Elitex Interior. Public HTML site stays at the repo root.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "db:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:import": "tsx scripts/import-content.ts",
+    "db:health": "tsx scripts/check-db.ts",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "next": "^16.3.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "prisma": "6.19.3",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}

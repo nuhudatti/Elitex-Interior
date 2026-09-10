@@ -1,0 +1,124 @@
+// Elitex Interior CMS — Phase 1
+// Public site still reads content/content.json. This schema is the future source of truth.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  owner
+  editor
+}
+
+enum ContentStatus {
+  draft
+  published
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  name         String   @unique
+  passwordHash String
+  passwordSalt String?
+  role         UserRole @default(editor)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions  Session[]
+  versions  ContentVersion[]
+  auditLogs AuditLog[]
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// Full content.json document (draft or published). Not normalized in Phase 1.
+model ContentDocument {
+  id            String        @id @default(cuid())
+  key           String        @unique
+  status        ContentStatus
+  schemaVersion Int           @default(1)
+  data          Json
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  versions ContentVersion[]
+}
+
+model Media {
+  id               String   @id @default(cuid())
+  legacyId         String?  @unique
+  publicId         String?
+  cloudName        String   @default("dpdmb5t1l")
+  resourceType     String
+  url              String
+  secureUrl        String?
+  format           String?
+  width            Int?
+  height           Int?
+  bytes            Int?
+  folder           String?
+  originalFilename String?
+  source           String   @default("cloudinary")
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([url])
+  @@index([publicId])
+  @@index([resourceType])
+}
+
+model ContentVersion {
+  id          String           @id @default(cuid())
+  documentId  String?
+  document    ContentDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  label       String?
+  data        Json
+  createdById String?
+  createdBy   User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+
+  @@index([documentId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?
+  detail    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([entity, entityId])
+}

@@ -73,7 +73,9 @@
         '<input class="input" data-key="' + f.key + '" value="' + esc(v) + '" placeholder="Upload or choose a ' + kindLbl + '…">' +
         '<button type="button" class="btn btn-sm btn-primary" data-upload="' + f.key + '" title="Upload a ' + kindLbl + ' from this device"><i class="fas fa-arrow-up-from-bracket"></i> Upload</button>' +
         '<button type="button" class="btn btn-sm" data-browse="' + f.key + '" title="Choose from what you already uploaded"><i class="fas fa-photo-film"></i> Library</button>' +
-        '</div>' + (f.hint ? '<div class="hint">' + esc(f.hint) + '</div>' : '') + '</div>';
+        '</div>' + '<div class="hint">' + esc(f.hint || (f.kind === 'video'
+          ? 'Upload MP4 or MOV (including 2+ minute videos). Keep this tab open — large files can take several minutes, then click Publish so it stays on the live site.'
+          : '')) + '</div></div>';
     }
     if (f.type === 'number') {
       return '<div class="field"><label>' + esc(f.label) + '</label><input type="number" class="input" data-key="' + f.key + '" value="' + esc(v) + '"' + (f.min != null ? ' min="' + f.min + '"' : '') + (f.max != null ? ' max="' + f.max + '"' : '') + '></div>';
@@ -108,7 +110,29 @@
     }
   }
 
-  var ACCEPT = { image: 'image/*', video: 'video/*', audio: 'audio/*' };
+  var ACCEPT = {
+    image: 'image/*',
+    video: 'video/mp4,video/quicktime,video/x-m4v,video/webm,.mov,.mp4,.m4v,.webm',
+    audio: 'audio/*,.mp3,.wav,.m4a'
+  };
+
+  function fmtBytes(n) {
+    n = n || 0;
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+    return (n / 1048576).toFixed(1) + ' MB';
+  }
+
+  function remindLive() {
+    CMS.toast('Saved in this browser. Click the rocket (Publish) so it stays on the public site after refresh.', 'info');
+  }
+
+  function needCloudinary() {
+    if (CMS.cloudinary.ready()) return true;
+    CMS.toast('Upload preset missing — add your Unsigned preset in Settings → Cloudinary', 'error');
+    CMS.app.go('settings');
+    return false;
+  }
 
   function wireMediaBrowse(body) {
     /* "Library" — pick from already-uploaded media (opens on top, editor stays) */
@@ -125,22 +149,19 @@
     $$('[data-upload]', body).forEach(function (btn) {
       btn.addEventListener('click', function () {
         var kind = (btn.closest('.media-pick') || {}).dataset ? btn.closest('.media-pick').dataset.mediaKind : '';
-        if (!CMS.cloudinary.ready()) {
-          CMS.toast('Connect Cloudinary in Settings first (cloud name + upload preset)', 'error');
-          return;
-        }
+        if (!needCloudinary()) return;
         var fi = document.createElement('input');
         fi.type = 'file';
-        fi.accept = ACCEPT[kind] || 'image/*,video/*';
+        fi.accept = ACCEPT[kind] || 'image/*,video/*,.mov,.mp4,.m4v,.webm';
         fi.onchange = function () {
           var file = fi.files[0];
           if (!file) return;
           var label = btn.innerHTML;
           btn.disabled = true;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 0%';
-          var folder = (CMS.store.draft.site.integrations.cloudinary || {}).defaultFolder || 'elitex';
+          var folder = CMS.cloudinary.config().defaultFolder || 'elitex';
           CMS.cloudinary.upload(file, folder, function (p) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + Math.round(p * 100) + '%';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + Math.round(p * 100) + '% · ' + fmtBytes(file.size);
           }).then(function (res) {
             var type = res.resource_type === 'video'
               ? (file.type.indexOf('audio') === 0 ? 'audio' : 'video') : 'image';
@@ -183,7 +204,9 @@
       var arr = CMS.store.list(cfg.path).slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
       if (!arr.length) {
         host.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i>Nothing here yet.<br><br>' +
-          '<button class="btn btn-primary btn-sm" data-add><i class="fas fa-plus"></i> ' + esc(cfg.addLabel || 'Add item') + '</button></div>';
+          '<button class="btn btn-primary btn-sm" data-add><i class="fas fa-plus"></i> ' + esc(cfg.addLabel || 'Add item') + '</button>' +
+          (cfg.addVideo ? ' <button class="btn btn-primary btn-sm" data-add-video><i class="fas fa-film"></i> Add video</button>' : '') +
+          '</div>';
       } else {
         host.innerHTML = '<div class="collection">' + arr.map(function (it) {
           return '<div class="item-row" draggable="true" data-id="' + it.id + '">' +
@@ -199,7 +222,9 @@
             '<button class="icon-btn" data-act="del" title="Delete" style="color:var(--red)"><i class="fas fa-trash"></i></button>' +
             '</div></div>';
         }).join('') + '</div>' +
-        '<div style="margin-top:12px"><button class="btn" data-add><i class="fas fa-plus"></i> ' + esc(cfg.addLabel || 'Add item') + '</button></div>';
+        '<div style="margin-top:12px"><button class="btn" data-add><i class="fas fa-plus"></i> ' + esc(cfg.addLabel || 'Add item') + '</button>' +
+        (cfg.addVideo ? ' <button class="btn btn-primary" data-add-video><i class="fas fa-film"></i> Add video</button>' : '') +
+        '</div>';
       }
 
       /* actions */
@@ -218,6 +243,7 @@
                 CMS.store.audit('edit', cfg.path + ' → ' + (cfg.titleOf(it) || id));
                 render();
                 CMS.toast('Saved to draft', 'success');
+                remindLive();
               }
             });
           } else if (act === 'dup') {
@@ -247,9 +273,29 @@
           var fresh = cfg.newItem ? cfg.newItem() : {};
           editItemModal('New — ' + (cfg.addLabel || 'item'), cfg.fields, fresh).then(function (patch) {
             if (patch) {
-              CMS.store.addItem(cfg.path, Object.assign(fresh, patch), cfg.prefix);
+              CMS.store.addItem(cfg.path, Object.assign(fresh, patch, { status: 'published' }), cfg.prefix);
               render();
-              CMS.toast('Added as draft', 'success');
+              CMS.toast('Added', 'success');
+              remindLive();
+            }
+          });
+        });
+      });
+      $$('[data-add-video]', host).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var fresh = Object.assign(cfg.newItem ? cfg.newItem() : {}, { mediaType: 'video', status: 'published' });
+          var fields = cfg.fields.map(function (f) {
+            if (f.key === 'src' || f.kind === 'video') {
+              return Object.assign({}, f, { type: 'media', kind: 'video' });
+            }
+            return f;
+          });
+          editItemModal('New video', fields, fresh).then(function (patch) {
+            if (patch) {
+              CMS.store.addItem(cfg.path, Object.assign(fresh, patch, { mediaType: 'video', status: 'published' }), cfg.prefix);
+              render();
+              CMS.toast('Video added', 'success');
+              remindLive();
             }
           });
         });
@@ -341,21 +387,18 @@
           wire();
         });
         $('#pickUpload', body).addEventListener('click', function () {
-          if (!CMS.cloudinary.ready()) {
-            CMS.toast('Connect Cloudinary in Settings first (cloud name + upload preset)', 'error');
-            return;
-          }
+          if (!needCloudinary()) return;
           var fi = document.createElement('input');
           fi.type = 'file';
-          fi.accept = ACCEPT[typeFilter] || 'image/*,video/*';
+          fi.accept = ACCEPT[typeFilter] || 'image/*,video/*,.mov,.mp4,.m4v,.webm';
           fi.onchange = function () {
             var file = fi.files[0];
             if (!file) return;
             var btn = $('#pickUpload', body);
             btn.disabled = true;
-            var folder = (CMS.store.draft.site.integrations.cloudinary || {}).defaultFolder || 'elitex';
+            var folder = CMS.cloudinary.config().defaultFolder || 'elitex';
             CMS.cloudinary.upload(file, folder, function (p) {
-              btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + Math.round(p * 100) + '%';
+              btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + Math.round(p * 100) + '% · ' + fmtBytes(file.size);
             }).then(function (res) {
               var type = res.resource_type === 'video'
                 ? (file.type.indexOf('audio') === 0 ? 'audio' : 'video') : 'image';
@@ -529,19 +572,20 @@
             '<div class="input-row">' +
             CMS.fText('"View all" label', 'pages.home.portfolio.viewAll.label', h.portfolio.viewAll.label) +
             CMS.fText('"View all" link', 'pages.home.portfolio.viewAll.href', h.portfolio.viewAll.href) + '</div></div><div id="pfList"></div>';
-          collectionUI({
+            collectionUI({
             el: $('#pfList', pane), path: 'pages.home.portfolio.items', prefix: 'pf', addLabel: 'Add gallery item',
+            addVideo: true,
             titleOf: function (i) { return i.title || '(no title)'; },
             subtitleOf: function (i) { return i.mediaType + ' · ' + i.size + (i.subtitle ? ' · ' + i.subtitle : ''); },
             fields: [
               { key: 'title', label: 'Title' },
               { key: 'subtitle', label: 'Subtitle' },
               { key: 'mediaType', label: 'Media type', type: 'select', options: ['video', 'image'] },
-              { key: 'src', label: 'Media file', type: 'media' },
+              { key: 'src', label: 'Media file', type: 'media', kind: 'video' },
               { key: 'size', label: 'Tile size', type: 'select', options: [{ value: 'normal', label: 'Normal (1×1)' }, { value: 'wide', label: 'Wide (2×1)' }, { value: 'tall', label: 'Tall (1×2)' }, { value: 'large', label: 'Large (2×2)' }] },
               { key: 'alt', label: 'Alt text (for images / SEO)' }
             ],
-            newItem: function () { return { mediaType: 'image', size: 'normal' }; }
+            newItem: function () { return { mediaType: 'image', size: 'normal', status: 'published' }; }
           });
         } else if (id === 'process') {
           pane.innerHTML = '<div class="card" style="margin-bottom:14px">' +
@@ -683,18 +727,19 @@
             pane.innerHTML = '<div id="scList"></div>';
             collectionUI({
               el: $('#scList', pane), path: 'pages.' + pageKey + '.items', prefix: 'sc', addLabel: 'Add gallery item',
+              addVideo: true,
               titleOf: function (i) { return i.title || i.projectSlug || '(untitled)'; },
               subtitleOf: function (i) { return i.mediaType + ' · ' + (i.category || '') + (i.projectSlug ? ' · opens: ' + i.projectSlug : ''); },
               fields: [
                 { key: 'title', label: 'Overlay title' },
                 { key: 'subtitle', label: 'Overlay subtitle' },
                 { key: 'mediaType', label: 'Media type', type: 'select', options: ['video', 'image'] },
-                { key: 'src', label: 'Media file', type: 'media' },
+                { key: 'src', label: 'Media file', type: 'media', kind: 'video', hint: 'For videos: upload MP4 or MOV here, then Publish to live site.' },
                 { key: 'category', label: 'Category', type: 'select', options: ['luxury', 'residential', 'commercial'] },
                 { key: 'projectSlug', label: 'Project details slug', hint: 'Matches an entry in Projects — clicking the tile opens that project\'s detail modal. Leave empty for no modal.' },
                 { key: 'alt', label: 'Alt text' }
               ],
-              newItem: function () { return { mediaType: 'image', category: 'luxury', lazy: true }; }
+              newItem: function () { return { mediaType: 'image', category: 'luxury', lazy: true, status: 'published' }; }
             });
           } else if (id === 'text') {
             pane.innerHTML = '<div class="card">' +
@@ -875,7 +920,9 @@
               { key: 'title', label: 'Title' },
               { key: 'subtitle', label: 'Subtitle' },
               { key: 'src', label: 'Video file', type: 'media', kind: 'video' }
-            ]
+            ],
+            newItem: function () { return { status: 'published' }; },
+            addVideo: true
           });
         } else if (id === 'hero') {
           pane.innerHTML = '<div class="card" style="margin-bottom:14px">' +
@@ -913,11 +960,11 @@
       var state = { q: '', type: 'all', folder: 'all' };
 
       el.innerHTML = '<div class="page-head"><div><h2>Media Library</h2>' +
-        '<p>All images, videos and audio used across the site. Uploads go straight to Cloudinary and are automatically optimized (WebP/AVIF, compression, responsive sizes) when displayed.</p></div>' +
+        '<p>All images, videos and audio used across the site. Uploads go to Cloudinary. <b>MOV and 2+ minute videos are supported</b> — keep this tab open until the bar reaches 100%.</p></div>' +
         '<div class="actions"><button class="btn" id="mBulkDel" style="display:none"><i class="fas fa-trash"></i> Remove selected</button>' +
-        '<button class="btn btn-primary" id="mUploadBtn"><i class="fas fa-cloud-arrow-up"></i> Upload</button></div></div>' +
-        '<div class="dropzone" id="mDrop"><i class="fas fa-cloud-arrow-up"></i><b>Drop files here</b> or click to choose — images & videos, bulk upload supported</div>' +
-        '<input type="file" id="mFile" multiple accept="image/*,video/*,audio/*" style="display:none">' +
+        '<button class="btn btn-primary" id="mUploadBtn"><i class="fas fa-cloud-arrow-up"></i> Upload video or image</button></div></div>' +
+        '<div class="dropzone" id="mDrop"><i class="fas fa-cloud-arrow-up"></i><b>Drop files here</b> or click to choose — images, MP4, MOV (including long videos)</div>' +
+        '<input type="file" id="mFile" multiple accept="image/*,video/*,audio/*,.mov,.mp4,.m4v,.webm" style="display:none">' +
         '<div class="upload-progress" id="mProg"><div class="lbl" id="mProgLbl"></div><div class="bar-track"><div class="bar" id="mProgBar"></div></div></div>' +
         '<div class="media-toolbar">' +
         '<input class="input" id="mSearch" placeholder="Search by name…">' +
@@ -1057,12 +1104,8 @@
       function uploadFiles(files) {
         files = Array.prototype.slice.call(files);
         if (!files.length) return;
-        if (!CMS.cloudinary.ready()) {
-          CMS.toast('Configure Cloudinary in Settings first (cloud name + unsigned upload preset)', 'error');
-          CMS.app.go('settings');
-          return;
-        }
-        var folder = CMS.store.draft.site.integrations.cloudinary.defaultFolder || 'elitex';
+        if (!needCloudinary()) return;
+        var folder = CMS.cloudinary.config().defaultFolder || 'elitex';
         var prog = $('#mProg', el), bar = $('#mProgBar', el), lbl = $('#mProgLbl', el);
         prog.classList.add('show');
         var done = 0;
@@ -1071,10 +1114,13 @@
           if (i >= files.length) {
             prog.classList.remove('show');
             CMS.toast(done + ' file' + (done === 1 ? '' : 's') + ' uploaded', 'success');
+            remindLive();
             return;
           }
           var f = files[i];
-          lbl.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + ' — ' + f.name;
+          var isLong = /\.mov$/i.test(f.name || '') || (f.size || 0) > 20 * 1024 * 1024;
+          lbl.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + ' — ' + f.name + ' (' + fmtBytes(f.size) + ')' +
+            (isLong ? ' · keep this tab open, long videos take several minutes' : '');
           bar.style.width = '0%';
           CMS.cloudinary.upload(f, folder, function (p) { bar.style.width = Math.round(p * 100) + '%'; })
             .then(function (res) {
@@ -1459,9 +1505,11 @@
         '<button type="button" class="btn btn-sm" id="stTestGit"><i class="fas fa-plug"></i> Test connection</button></div>' +
 
         '<div class="card"><h3 style="margin-bottom:12px"><i class="fas fa-cloud" style="color:var(--gold);margin-right:8px"></i>Cloudinary</h3>' +
+        (!cld.uploadPreset ? '<div class="hint" style="color:var(--amber);margin-bottom:12px"><b>Upload preset is empty</b> — that is why uploads say “preset not found”. Create an Unsigned preset in Cloudinary and paste its name below, then Save.</div>' : '') +
         CMS.fText('Cloud name', 'site.integrations.cloudinary.cloudName', cld.cloudName) +
-        CMS.fText('Unsigned upload preset', 'site.integrations.cloudinary.uploadPreset', cld.uploadPreset, 'Cloudinary console → Settings → Upload → Upload presets → Add preset → Signing mode: Unsigned. This lets the dashboard upload without exposing any secret key.') +
-        CMS.fText('Default upload folder', 'site.integrations.cloudinary.defaultFolder', cld.defaultFolder) + '</div>' +
+        CMS.fText('Unsigned upload preset', 'site.integrations.cloudinary.uploadPreset', cld.uploadPreset, 'Cloudinary console → Settings → Upload → Upload presets → Add upload preset → Signing mode: Unsigned. Copy the preset name here. Also raise the max file size on that preset for long .mov videos.') +
+        CMS.fText('Default upload folder', 'site.integrations.cloudinary.defaultFolder', cld.defaultFolder) +
+        '<button type="button" class="btn btn-primary btn-sm" id="stSaveCld"><i class="fas fa-check"></i> Save Cloudinary</button></div>' +
 
         '<div class="card"><h3 style="margin-bottom:12px"><i class="fas fa-shield-halved" style="color:var(--gold);margin-right:8px"></i>Security</h3>' +
         '<div class="field"><label>Session timeout (minutes)</label><input class="input" type="number" min="5" max="480" id="stTimeout" value="' + esc(s.sessionTimeout) + '"><div class="hint">You are logged out automatically after this much inactivity.</div></div>' +
@@ -1514,6 +1562,20 @@
         s.sessionTimeout = Math.max(5, parseInt($('#stTimeout', el).value, 10) || 30);
         CMS.store.saveSettings();
         CMS.toast('Saved', 'success');
+      });
+
+      var saveCld = $('#stSaveCld', el);
+      if (saveCld) saveCld.addEventListener('click', function () {
+        var nameEl = $('[data-path="site.integrations.cloudinary.cloudName"]', el);
+        var presetEl = $('[data-path="site.integrations.cloudinary.uploadPreset"]', el);
+        var folderEl = $('[data-path="site.integrations.cloudinary.defaultFolder"]', el);
+        if (nameEl) CMS.store.set('site.integrations.cloudinary.cloudName', String(nameEl.value || '').trim());
+        if (presetEl) CMS.store.set('site.integrations.cloudinary.uploadPreset', String(presetEl.value || '').trim());
+        if (folderEl) CMS.store.set('site.integrations.cloudinary.defaultFolder', String(folderEl.value || '').trim() || 'elitex');
+        CMS.store.syncCloudinary();
+        CMS.store.audit('settings', 'Cloudinary settings updated');
+        if (!CMS.cloudinary.ready()) CMS.toast('Preset still empty — paste the Unsigned preset name', 'error');
+        else CMS.toast('Cloudinary saved on this browser. Publish the site so it is stored in content.json too.', 'success');
       });
 
       function renderUsers() {

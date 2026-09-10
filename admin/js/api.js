@@ -11,9 +11,76 @@
   /* Cloudinary                                                          */
   /* ------------------------------------------------------------------ */
 
+  var CHUNK = 6 * 1024 * 1024; /* 6MB — keeps long .mov uploads alive */
+  var MAX_TRIES = 4;
+
+  function resourceTypeOf(file) {
+    var name = ((file && file.name) || '').toLowerCase();
+    var type = ((file && file.type) || '').toLowerCase();
+    if (type.indexOf('audio') === 0 || /\.(mp3|wav|ogg|m4a)$/.test(name)) return 'video';
+    if (type.indexOf('video') === 0 || /\.(mov|mp4|m4v|webm|avi|mkv|qt)$/.test(name)) return 'video';
+    return 'image';
+  }
+
+  function parseCldError(xhr) {
+    var msg = '';
+    try { msg = (JSON.parse(xhr.responseText).error || {}).message || ''; } catch (e) {}
+    if (!msg && xhr.status) msg = 'Upload failed (' + xhr.status + ')';
+    if (/preset/i.test(msg)) {
+      return 'Upload preset not found. Open Settings → Cloudinary and paste your Unsigned preset name (Cloudinary → Settings → Upload → Upload presets → Add, Signing mode: Unsigned).';
+    }
+    if (!msg || xhr.status === 0) {
+      return 'Network error during upload. Large .mov files need a stable connection — keep this tab open and try again. If it keeps failing, compress the video or export as MP4.';
+    }
+    return msg;
+  }
+
+  function postChunk(url, form, headers, onProgress, timeoutMs) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+      Object.keys(headers || {}).forEach(function (k) { xhr.setRequestHeader(k, headers[k]); });
+      xhr.timeout = timeoutMs || 0;
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable && onProgress) onProgress(e.loaded, e.total);
+      };
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText || '{}')); }
+          catch (e) { reject(new Error('Cloudinary returned an invalid response')); }
+        } else {
+          reject(new Error(parseCldError(xhr)));
+        }
+      };
+      xhr.onerror = function () { reject(new Error(parseCldError(xhr))); };
+      xhr.ontimeout = function () { reject(new Error('Upload timed out. Keep this tab open and retry — 2+ minute .mov files often need a few attempts on a slow connection.')); };
+      xhr.send(form);
+    });
+  }
+
+  function withRetries(fn) {
+    var attempt = 0;
+    var run = function () {
+      return fn(attempt).catch(function (err) {
+        var fatal = /preset not found|not configured|invalid/i.test(err.message || '');
+        attempt++;
+        if (fatal || attempt >= MAX_TRIES) throw err;
+        var wait = Math.min(1500 * attempt, 6000);
+        return new Promise(function (r) { setTimeout(r, wait); }).then(run);
+      });
+    };
+    return run();
+  }
+
   var Cloudinary = {
     config: function () {
-      return (CMS.store.draft.site.integrations || {}).cloudinary || {};
+      var c = ((CMS.store.draft.site || {}).integrations || {}).cloudinary || {};
+      var s = CMS.store.settings || {};
+      return {
+        cloudName: String(c.cloudName || s.cldCloudName || '').trim(),
+        uploadPreset: String(c.uploadPreset || s.cldPreset || '').trim(),
+        defaultFolder: String(c.defaultFolder || s.cldFolder || 'elitex').trim() || 'elitex'
+      };
     },
 
     ready: function () {
@@ -22,37 +89,59 @@
     },
 
     /**
-     * Upload one file with progress callback.
-     * Uses the unsigned upload preset — create one in the Cloudinary console
-     * (Settings → Upload → Upload presets → Add, mode "Unsigned").
+     * Upload one file with progress callback (0–1).
+     * Videos (including 2+ minute .mov) use chunked video/upload + async processing
+     * so the browser connection is not held open while Cloudinary transcodes.
      */
     upload: function (file, folder, onProgress) {
       var c = Cloudinary.config();
-      if (!Cloudinary.ready()) {
-        return Promise.reject(new Error('Cloudinary is not configured. Add your cloud name and unsigned upload preset in Settings.'));
+      if (!c.cloudName) {
+        return Promise.reject(new Error('Cloudinary cloud name is missing. Add it in Settings → Cloudinary.'));
       }
-      return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        var form = new FormData();
-        form.append('file', file);
-        form.append('upload_preset', c.uploadPreset);
-        if (folder) form.append('folder', folder);
-        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(c.cloudName) + '/auto/upload');
-        xhr.upload.onprogress = function (e) {
-          if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total);
-        };
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(JSON.parse(xhr.responseText));
-          } else {
-            var msg = 'Upload failed (' + xhr.status + ')';
-            try { msg = JSON.parse(xhr.responseText).error.message; } catch (e) {}
-            reject(new Error(msg));
+      if (!c.uploadPreset) {
+        return Promise.reject(new Error('Upload preset not found. Open Settings → Cloudinary and paste your Unsigned upload preset name.'));
+      }
+      folder = folder || c.defaultFolder;
+      var rtype = resourceTypeOf(file);
+      var url = 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(c.cloudName) + '/' + rtype + '/upload';
+      var isVideo = rtype === 'video';
+      var uid = (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).slice(0, 20);
+      var total = file.size || 0;
+      var report = function (loaded) {
+        if (onProgress && total) onProgress(Math.min(loaded / total, 0.99));
+      };
+
+      var sendRange = function (start) {
+        var end = Math.min(start + CHUNK, total) - 1;
+        if (end < start && total) end = total - 1;
+        var last = !total || end >= total - 1;
+        var headers = {};
+        if (total > CHUNK) {
+          headers['X-Unique-Upload-Id'] = uid;
+          headers['Content-Range'] = 'bytes ' + start + '-' + end + '/' + total;
+        }
+        return withRetries(function () {
+          var blob = total ? file.slice(start, end + 1) : file;
+          var form = new FormData();
+          form.append('file', blob, file.name || 'upload');
+          form.append('upload_preset', c.uploadPreset);
+          if (folder) form.append('folder', folder);
+          return postChunk(url, form, headers, function (loaded) {
+            report(start + loaded);
+          }, last && isVideo ? 12 * 60 * 1000 : 0);
+        }).then(function (res) {
+          if (!last && total > CHUNK) return sendRange(end + 1);
+          if (onProgress) onProgress(1);
+          if (res && res.error && res.error.message) throw new Error(res.error.message);
+          if (res && !res.secure_url && res.public_id) {
+            res.secure_url = 'https://res.cloudinary.com/' + c.cloudName + '/' + rtype + '/upload/' + res.public_id;
           }
-        };
-        xhr.onerror = function () { reject(new Error('Network error during upload')); };
-        xhr.send(form);
-      });
+          if (!res || !res.secure_url) throw new Error('Upload finished but Cloudinary did not return a video URL. Wait a minute and check Media Library.');
+          return res;
+        });
+      };
+
+      return sendRange(0);
     }
   };
 

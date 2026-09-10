@@ -14,7 +14,7 @@
   var VERSIONS_KEY = 'elitexcms.versions.v1';
   var AUDIT_KEY = 'elitexcms.audit.v1';
   var SETTINGS_KEY = 'elitexcms.settings.v1';
-  var SETTINGS_KEYS = ['repo', 'branch', 'githubTokenEnc', 'sessionTimeout', 'previewPage'];
+  var SETTINGS_KEYS = ['repo', 'branch', 'githubTokenEnc', 'sessionTimeout', 'previewPage', 'cldCloudName', 'cldPreset', 'cldFolder'];
 
   var Store = {
     published: null,
@@ -26,7 +26,10 @@
       branch: 'main',
       githubTokenEnc: '',
       sessionTimeout: 30,
-      previewPage: 'index.html'
+      previewPage: 'index.html',
+      cldCloudName: 'dpdmb5t1l',
+      cldPreset: '',
+      cldFolder: 'elitex'
     },
 
     settingsPayload: function () {
@@ -54,7 +57,21 @@
           var draft = null;
           try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
           Store.draft = draft || CMS.clone(json);
+          Store.syncCloudinary();
         });
+    },
+
+    /* Keep Cloudinary keys in browser settings so uploads still work if content.json has an empty preset. */
+    syncCloudinary: function () {
+      var integ = Store.draft.site.integrations || (Store.draft.site.integrations = {});
+      var c = integ.cloudinary || (integ.cloudinary = {});
+      if (!c.cloudName && Store.settings.cldCloudName) c.cloudName = Store.settings.cldCloudName;
+      if (!c.uploadPreset && Store.settings.cldPreset) c.uploadPreset = Store.settings.cldPreset;
+      if (!c.defaultFolder && Store.settings.cldFolder) c.defaultFolder = Store.settings.cldFolder;
+      if (c.cloudName) Store.settings.cldCloudName = c.cloudName;
+      if (c.uploadPreset) Store.settings.cldPreset = c.uploadPreset;
+      if (c.defaultFolder) Store.settings.cldFolder = c.defaultFolder;
+      Store.saveSettings();
     },
 
     saveSettings: function () {
@@ -100,6 +117,10 @@
 
     set: function (path, value) {
       CMS.set(Store.draft, path, value);
+      if (path === 'site.integrations.cloudinary.uploadPreset') Store.settings.cldPreset = String(value || '').trim();
+      if (path === 'site.integrations.cloudinary.cloudName') Store.settings.cldCloudName = String(value || '').trim();
+      if (path === 'site.integrations.cloudinary.defaultFolder') Store.settings.cldFolder = String(value || '').trim() || 'elitex';
+      if (path.indexOf('site.integrations.cloudinary.') === 0) Store.saveSettings();
       Store.change({ path: path });
     },
 
@@ -127,7 +148,7 @@
     addItem: function (path, item, prefix) {
       var arr = Store.list(path);
       item.id = item.id || CMS.uid(prefix || 'it');
-      item.status = item.status || 'draft';
+      item.status = item.status || 'published';
       item.order = arr.length ? arr.reduce(function (m, i) { return Math.max(m, i.order || 0); }, 0) + 1 : 1;
       arr.push(item);
       Store.change({ path: path });

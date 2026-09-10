@@ -1,0 +1,54 @@
+# Phase 1 only: prove a hosted runner can reach Neon, then migrate/import/health.
+# Secrets stay in GitHub Actions. Nothing here is sent to the public site.
+name: CMS Neon connectivity
+
+on:
+  workflow_dispatch:
+
+jobs:
+  neon-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: cms
+    env:
+      DATABASE_URL: ${{ secrets.CMS_DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.CMS_DIRECT_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Confirm Neon host without printing secrets
+        run: node ../.github/scripts/confirm-neon-host.mjs
+
+      - name: Migrate
+        run: npx prisma migrate deploy
+
+      - name: Import content.json
+        run: npm run db:import
+
+      - name: CLI health
+        run: npm run db:health
+
+      - name: Build and hit /api/health
+        run: |
+          npm run build
+          npm run start &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:3001/api/health; then
+              echo
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "health endpoint did not become ready"
+          exit 1
