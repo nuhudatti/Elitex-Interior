@@ -36,17 +36,26 @@ export function isPublicSiteOrigin(origin: string) {
   return extraPublicSiteOrigins().includes(origin);
 }
 
-/** CORS for public GET APIs only. Reflects allowed browser origins; never used for credentialed CMS routes. */
-export function publicCors(response: NextResponse, request?: Request) {
+function applyPublicCors(response: NextResponse, request: Request | undefined, methods: string) {
   const origin = request?.headers.get('origin') || '';
   if (origin && isPublicSiteOrigin(origin)) {
     response.headers.set('Access-Control-Allow-Origin', origin);
     response.headers.set('Vary', 'Origin');
   }
-  response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  response.headers.set('Access-Control-Allow-Methods', methods);
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
   response.headers.set('Access-Control-Max-Age', '86400');
   return response;
+}
+
+/** CORS for public GET APIs only. Reflects allowed browser origins; never used for credentialed CMS routes. */
+export function publicCors(response: NextResponse, request?: Request) {
+  return applyPublicCors(response, request, 'GET, OPTIONS');
+}
+
+/** CORS for public read/write APIs such as client reviews. */
+export function publicWriteCors(response: NextResponse, request?: Request) {
+  return applyPublicCors(response, request, 'GET, POST, OPTIONS');
 }
 
 export function publicDbError(error: unknown): string {
