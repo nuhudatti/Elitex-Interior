@@ -1593,7 +1593,6 @@
     var about = $('#about');
     var stage = $('#heroStage');
     var copy = hero ? hero.querySelector('.ex-hero-copy') : null;
-    var hint = hero ? hero.querySelector('.ex-scroll') : null;
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reduce) {
@@ -1636,18 +1635,7 @@
         }
       });
     }
-    if (hint) {
-      gsap.to(hint, {
-        opacity: 0,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: hero,
-          start: 'top top',
-          end: 'center top',
-          scrub: 0.35
-        }
-      });
-    }
+    /* Hero scroll cue fade is owned by .ex-scroll.is-away */
     if (stage) {
       gsap.fromTo(stage, { scale: 1 }, {
         scale: 1.05,
@@ -1766,11 +1754,50 @@
     var navbar = $('#navbar');
     if (navbar && !navbar.__bound) {
       navbar.__bound = true;
+      var layoutHeroCue = function () {
+        var cue = $('.ex-scroll');
+        var heroEl = $('#hero');
+        var actions = heroEl ? heroEl.querySelector('.ex-hero-actions') : null;
+        if (!cue) return;
+        var away = window.scrollY > 36;
+        cue.classList.remove('is-shift');
+        if (heroEl) {
+          var box = heroEl.getBoundingClientRect();
+          var span = Math.max(120, box.height * 0.38);
+          var passed = Math.min(100, Math.max(0, (-box.top / span) * 100));
+          cue.style.setProperty('--ex-scroll-p', String(Math.round(passed)));
+          if (box.bottom < 140) away = true;
+        }
+        if (!away && actions) {
+          var a = actions.getBoundingClientRect();
+          var c = cue.getBoundingClientRect();
+          var hits = !(c.right < a.left - 10 || c.left > a.right + 10 || c.bottom < a.top - 10 || c.top > a.bottom + 10);
+          if (hits) {
+            if (window.innerWidth >= 760) cue.classList.add('is-shift');
+            else away = true;
+          }
+        }
+        cue.classList.toggle('is-away', away);
+      };
       var onScroll = function () {
         navbar.classList.toggle('is-scrolled', window.scrollY > 40);
+        layoutHeroCue();
       };
       onScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', layoutHeroCue);
+      setTimeout(layoutHeroCue, 1200);
+    }
+    var scrollCue = $('#heroScroll') || $('.ex-scroll');
+    if (scrollCue && !scrollCue.__bound) {
+      scrollCue.__bound = true;
+      scrollCue.addEventListener('click', function (e) {
+        var about = $('#about');
+        if (!about) return;
+        e.preventDefault();
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        about.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      });
     }
     if (!document.__exUnlock) {
       document.__exUnlock = true;
