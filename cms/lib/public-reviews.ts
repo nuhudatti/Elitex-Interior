@@ -15,7 +15,7 @@ export type PublicReview = {
   quote: string;
   text: string;
   rating: number;
-  status: 'published';
+  status: 'published' | 'hidden';
   source: 'public';
   order: number;
   createdAt: string;
